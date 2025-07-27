@@ -11,14 +11,14 @@ const port = parseInt(process.env.PORT || '3000', 10)
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
-// Top-level await (ES2022)
+// Top-level await
 await app.prepare()
 
 const server = express()
 
 // Example API route
 server.get('/api/hello', (req, res) => {
-  res.status(200).json({ message: 'Hello from ES2022 server!' })
+  res.status(200).json({ message: 'Hello from ESModule server!' })
 })
 
 // Handle everything else (Next.js pages)
