@@ -1,31 +1,32 @@
-// server/index.ts
-import express from 'express'
-import next from 'next'
-import dotenv from 'dotenv'
+// server.ts
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import fetchEthGas from '@/app/api/fetchEthGas';
 
-dotenv.config()
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*" } // adjust in prod
+});
 
-const dev = process.env.NODE_ENV !== 'production'
-const port = parseInt(process.env.PORT || '3000', 10)
-const app = next({ dev })
-const handle = app.getRequestHandler()
+io.on('connection', (socket) => {
+  console.log('🔌 Client connected');
 
-// Top-level await
-await app.prepare()
+  const interval = setInterval(async () => {
+    const gasPrice = await fetchEthGas();
+    if (gasPrice) {
+      socket.emit('gasPrice', gasPrice.toString()); // Send to frontend
+    }
+  }, 1000);
 
-const server = express()
+  socket.on('disconnect', () => {
+    clearInterval(interval);
+    console.log('❌ Client disconnected');
+  });
+});
 
-// Example API route
-server.get('/api/hello', (req, res) => {
-  res.status(200).json({ message: 'Hello from ESModule server!' })
-})
-
-// Handle everything else (Next.js pages)
-server.all('*', (req, res) => {
-  return handle(req, res)
-})
-
-// Start server
-server.listen(port, () => {
-  console.log(`🚀 Server running at http://localhost:${port}`)
-})
+const PORT = 4000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
