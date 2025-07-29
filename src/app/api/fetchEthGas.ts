@@ -41,6 +41,7 @@ export default async function getGasPrice(): Promise<void> {
 
     const gasPriceWei = BigInt(data.result);
 
+
     console.log(`🚀Ethereum Gas Price: ${gasPriceWei} Gwei`);
   } catch (error) {
     console.error("❌ Error fetching gas price:", error);
