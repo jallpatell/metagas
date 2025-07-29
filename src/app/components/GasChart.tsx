@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LineChart,
+  AreaChart,
+  Area,
   Line,
   XAxis,
   YAxis,
@@ -16,66 +18,73 @@ type DataPoint = {
   price: number;
 };
 
-export default function LivePriceChart() {
+type GasChartProps = {
+  gasPrice: string | null;
+};
+
+export default function LivePriceChart({ gasPrice }: GasChartProps) {
   const [data, setData] = useState<DataPoint[]>([]);
+
   const MAX_POINTS = 15 * 60; // 900 points = 15 minutes
-  const requestRef = useRef<number>();
-  const lastTickRef = useRef<number>(Date.now());
 
   // Format current time as HH:mm:ss
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { hour12: false });
   };
 
-  const updateChart = () => {
-    const now = Date.now();
-    if (now - lastTickRef.current >= 1000) {w
-      const newPoint: DataPoint = {
-        time: formatTime(new Date()),
-        price: +(Math.random() * 1000).toFixed(2), // Replace with actual price
-      };
-
-      setData((prev) => {
-        const updated = [...prev, newPoint];
-        if (updated.length > MAX_POINTS) {
-          updated.shift(); // Remove the oldest point
-        }
-        return updated;
-      });
-
-      lastTickRef.current = now;
-    }
-
-    requestRef.current = requestAnimationFrame(updateChart);
-  };
-
+  // Push new point to the chart whenever gasPrice updates
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(updateChart);
-    return () => cancelAnimationFrame(requestRef.current!);
-  }, []);
+    if (!gasPrice) return;
+
+    const numericPrice = parseFloat(gasPrice);
+    if (isNaN(numericPrice)) return;
+
+    const newPoint: DataPoint = {
+      time: formatTime(new Date()),
+      price: numericPrice,
+    };
+
+    setData((prev) => {
+      const updated = [...prev, newPoint];
+      if (updated.length > MAX_POINTS) {
+        updated.shift(); // Keep only the latest MAX_POINTS
+      }
+      return updated;
+    });
+  }, [gasPrice]); // 🔁 runs every time gasPrice changes
 
   return (
     <div className="w-full h-64 p-4">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="time"
-            tick={{ fontSize: 10 }}
-            minTickGap={20}
-            interval="preserveStartEnd"
-          />
-          <YAxis domain={['auto', 'auto']} />
-          <Tooltip isAnimationActive={false} />
-          <Line
-            type="monotone"
-            dataKey="price"
-            stroke="#8884d8"
-            dot={false}
-            isAnimationActive={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+<ResponsiveContainer width="100%" height="100%">
+  <AreaChart data={data}>
+    <defs>
+      <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.4} />
+        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+      </linearGradient>
+    </defs>
+    <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+    <XAxis
+      dataKey="time"
+      tick={{ fontSize: 10, fill: '#ffffff' }}
+    />
+    <YAxis
+      domain={['auto', 'auto']}
+      tick={{ fontSize: 15, fontFamily: 'Arial', fill: '#ffffff' }}
+    />
+    <Tooltip />
+    <Area
+      type="monotone"
+      dataKey="price"
+      stroke="#8884d8"
+      fill="url(#colorPrice)" // gradient fill
+      fillOpacity={1}
+      dot={false}
+      isAnimationActive={false}
+    />
+  </AreaChart>
+</ResponsiveContainer>
+
     </div>
   );
 }
