@@ -1,4 +1,6 @@
 import dotenv from 'dotenv'
+import { WebSocketServer } from 'ws'
+import http from 'http'
 dotenv.config() 
 
 type JsonRpcRequest = {
@@ -15,8 +17,22 @@ type JsonRpcResponse = {
 };
 
 const url = process.env.NODE_URL
+const PORT = 4001
+const server = http.createServer();
+const wss = new WebSocketServer({ server });
 
-export default async function getGasPrice(): Promise<void> {
+const clients = new Set<WebSocket>();
+
+wss.on('connection', (ws) => {
+  console.log('🔌 Client connected');
+  clients.add(ws);
+
+  ws.on('close', () => {
+    console.log('❌ Client disconnected');
+    clients.delete(ws);
+  });
+});
+async function getGasPrice(): Promise<void> {
   const requestBody: JsonRpcRequest = {
     jsonrpc: "2.0",
     method: "eth_gasPrice",
@@ -25,7 +41,7 @@ export default async function getGasPrice(): Promise<void> {
   };
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(url!, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -35,17 +51,31 @@ export default async function getGasPrice(): Promise<void> {
 
     const data: JsonRpcResponse = await response.json();
 
-    if (!data.result) {
-      throw new Error("Invalid response from JSON-RPC");
-    }
+    if (!data.result) throw new Error("Invalid JSON-RPC response");
 
     const gasPriceWei = BigInt(data.result);
+    const gasPriceGwei = Number(gasPriceWei) / 1e9; // convert to Gwei as a float
+    const gasPriceGweiRounded = gasPriceGwei.toFixed(9); // convert to Gwei
 
+    console.log(`🚀 Ethereum Gas Price: ${gasPriceGweiRounded} Gwei`);
 
-    console.log(`🚀Ethereum Gas Price: ${gasPriceWei} Gwei`);
+    // Send to all connected clients
+    const payload = JSON.stringify({ gasPrice: gasPriceGweiRounded });
+    clients.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(payload);
+      }
+    });
+
   } catch (error) {
     console.error("❌ Error fetching gas price:", error);
   }
 }
 
-getGasPrice();
+// Poll every 3 seconds
+setInterval(getGasPrice, 1000);
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`✅ WebSocket server running at ws://localhost:${PORT}`);
+});
