@@ -147,25 +147,25 @@ const LandingPage = () => {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
                 Features
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="#how-it-works" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
                 How It Works
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="#testimonials" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
                 Reviews
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="#pricing" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
                 Pricing
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <div className="flex items-center space-x-3">
                 <button className="text-gray-300 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-200">
                   Login
                 </button>
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 hover:scale-105 transition-all duration-300 font-medium shadow-lg shadow-blue-500/25">
+                <button className="bg-gradient-to-r from-blue-800 to-blue-800 px-6 py-2 rounded-lg hover:from-blue-400 hover:to-blue-700 hover:scale-105 transition-all duration-300 font-medium shadow-lg shadow-blue-500/25">
                   Get Started
                 </button>
               </div>
@@ -189,7 +189,7 @@ const LandingPage = () => {
           <div className="mb-8">
             <GlassCard className="inline-flex items-center space-x-2 px-4 py-2 mb-6" hover={false}>
               <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm text-gray-300">Ethereum, Polygon & Arbitrum</span>
+              <span className="text-sm text-gray-300">Track Ethereum, Polygon & Arbitrum Gas</span>
             </GlassCard>
           </div>
           
