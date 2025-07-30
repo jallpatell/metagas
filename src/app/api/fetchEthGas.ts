@@ -16,7 +16,7 @@ type JsonRpcResponse = {
   result: string;
 };
 
-const url = process.env.NODE_URL
+const url = process.env.ETH_NODE_URL
 const PORT = 4001
 const server = http.createServer();
 const wss = new WebSocketServer({ server });
