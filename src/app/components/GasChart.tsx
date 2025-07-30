@@ -66,7 +66,7 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
     <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
     <XAxis
       dataKey="time"
-      tick={{ fontSize: 10, fill: '#ffffff' }}
+      tick={{ fontSize: 10  , fill: '#ffffff' }}
     />
     <YAxis
       domain={['auto', 'auto']}
@@ -78,7 +78,7 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
       dataKey="price"
       stroke="#8884d8"
       fill="url(#colorPrice)" // gradient fill
-      fillOpacity={1}
+      fillOpacity={2}
       dot={false}
       isAnimationActive={false}
     />
