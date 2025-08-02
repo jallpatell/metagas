@@ -16,10 +16,7 @@ export default function () {
   }, []);
     
     return (
-        <div className="text-3xl align-middle  h-screen flex  justify-center">
-            <div className="p-4 text-lg font-mono">
-                Current Ethereum Gas Price: {gasPrice ? `${gasPrice} Gwei` : 'Loading...'}
-            </div>
+        <div className="text-3xl align-middle  h-100 w-3xl flex  justify-center">
             <GasChart gasPrice={gasPrice}/>
         </div>
     )
