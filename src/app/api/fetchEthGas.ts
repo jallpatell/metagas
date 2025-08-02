@@ -54,13 +54,13 @@ async function getGasPrice(): Promise<void> {
     if (!data.result) throw new Error("Invalid JSON-RPC response");
 
     const gasPriceWei = BigInt(data.result);
-    const gasPriceGwei = Number(gasPriceWei) / 1e9; // convert to Gwei as a float
-    const gasPriceGweiRounded = gasPriceGwei.toFixed(9); // convert to Gwei
+    // const gasPriceGwei = Number(gasPriceWei) / 1e9; // convert to Gwei as a float
+    // const gasPriceGweiRounded = gasPriceGwei.toFixed(9); // convert to Gwei
 
-    console.log(`🚀 Ethereum Gas Price: ${gasPriceGweiRounded} Gwei`);
+    console.log(`🚀 Ethereum Gas Price: ${gasPriceWei} Gwei`);
 
     // Send to all connected clients
-    const payload = JSON.stringify({ gasPrice: gasPriceGweiRounded });
+    const payload = JSON.stringify({ gasPrice: gasPriceWei });
     clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
         client.send(payload);
