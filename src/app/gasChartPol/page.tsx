@@ -5,7 +5,7 @@ export default function () {
     const [gasPrice, setGasPrice] = useState<string | null>(null);
 
     useEffect(() => {
-    const socket = new WebSocket('ws://localhost:4002');
+    const socket = new WebSocket('ws://localhost:4001');
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.gasPrice) {
