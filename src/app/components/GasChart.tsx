@@ -22,8 +22,28 @@ type GasChartProps = {
   gasPrice: string | null;
 };
 
+
 export default function LivePriceChart({ gasPrice }: GasChartProps) {
-  const [data, setData] = useState<DataPoint[]>([]);
+  const [data, setData] = useState<DataPoint[]>(() => {
+  const now = new Date();
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { hour12: false });
+  };
+  const initial: DataPoint[] = [];
+
+  for (let i = 14; i >= 0; i--) {
+    const time = new Date(now.getTime() - i * 1000); // 1 second apart
+    const price =
+      Math.random() * (0.5 - 0.2) + 0.2; // Random between 0.3 and 0.5
+      initial.push({
+      time: formatTime(time),
+      price: parseFloat(price.toFixed(9)),
+    });
+  }
+
+  return initial;
+});
+
 
   const MAX_POINTS = 15 * 60; // 900 points = 15 minutes
 

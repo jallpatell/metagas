@@ -81,11 +81,11 @@ const StockTradingInterface = ({ gasPrice }) => {
   const [activeTimeframe, setActiveTimeframe] = useState("1D");
   const [stockData] = useState({
     symbol: "Ethereum Mainnet",
-    change: 2.34,
+    change: 0.000000176,
     changePercent: 1.35,
     volume: "1.2M",
-    high: gasPrice + 10,
-    low: gasPrice - 10,
+    high: 0.983,
+    low: 0.123,
     open: gasPrice,
   });
   const [orderBook] = useState({
@@ -116,23 +116,15 @@ const StockTradingInterface = ({ gasPrice }) => {
       <GridBackground />
       <Navbar />
       <section className="z-10 pt-10 pb-4">
-        <div className="max-w-7xl mx-auto px-6 mt-20">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between space-y-2 sm:space-y-0">
-            <h1 className="text-3xl md:text-5xl font-bold leading-tight bg-clip-text text-transparent bg-white drop-shadow-lg">
-              Ethereum Mainnet Trading Dashboard
-            </h1>
-            
-          </div>
-          <p className="text-md md:text-lg text-white-00 max-w-2xl mt-4">
-            Track live Ethereum gas prices, explore recent trades, and view market depth in a real-time, glassy Web3 interface.
-          </p>
+        <div className="max-w-7xl mx-auto px-6 mt-10">
+          
         </div>
       </section>
       <section className="z-10 py-6">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-10 gap-8">
           {/* Main Chart and Stock Info */}
           <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
-            <GlassCard className="p-8 w-full">
+            <GlassCard className="p-8 w-auto">
               {/* Header */}
               <div className="flex flex-wrap justify-between items-center mb-8">
                 {/* Ticker Info */}
@@ -202,7 +194,7 @@ const StockTradingInterface = ({ gasPrice }) => {
                   <GasChartEth />
                 </div>
               </div>
-            </GlassCard>
+                </GlassCard>
           </div>
 
           {/* Order Book & Recent Trades */}
