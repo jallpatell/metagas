@@ -1,3 +1,4 @@
+"use client"
 import dotenv from 'dotenv'
 import { WebSocketServer } from 'ws'
 import http from 'http'
