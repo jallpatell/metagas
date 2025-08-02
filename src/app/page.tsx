@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Zap, TrendingUp, Wallet, Shield, Clock, BarChart3, ArrowRight, Star, Users, DollarSign, Activity } from 'lucide-react';
+import Navbar from './components/Navbar';
 
 const LandingPage = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -133,63 +134,15 @@ const LandingPage = () => {
       <GridBackground />
       
       {/* Navigation */}
-      <nav className="relative z-10 backdrop-blur-md bg-black/20 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              
-              <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                MetaGas
-              </span>
-            </div>
-            
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
-                Features
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#how-it-works" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
-                How It Works
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#testimonials" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
-                Reviews
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#pricing" className="text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 relative group">
-                Pricing
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <div className="flex items-center space-x-3">
-                <button className="text-gray-300 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-200">
-                  Login
-                </button>
-                <button className="bg-gradient-to-r from-blue-800 to-blue-800 px-6 py-2 rounded-lg hover:from-blue-400 hover:to-blue-700 hover:scale-105 transition-all duration-300 font-medium shadow-lg shadow-blue-500/25">
-                  Get Started
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-20 pb-32">
+      <section className="relative mt-15 z-10 pt-20 pb-32">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="mb-8">
-            <GlassCard className="inline-flex items-center space-x-2 px-4 py-2 mb-6" hover={false}>
+            <GlassCard className="inline-flex items-center transition duration-300  hover:border-white space-x-2 px-4 py-2 mb-6" hover={false}>
               <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm text-gray-300">Track Ethereum, Polygon & Arbitrum Gas</span>
+              <span className="text-sm text-gray-300 ">Track Ethereum, Polygon & Arbitrum Gas</span>
             </GlassCard>
           </div>
           
