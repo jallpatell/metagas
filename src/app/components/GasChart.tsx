@@ -66,19 +66,20 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
     <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
     <XAxis
       dataKey="time"
-      tick={{ fontSize: 10  , fill: '#ffffff' }}
+      tick={{ fontSize: 10, fill: '#ffffff' }}
     />
     <YAxis
       domain={['auto', 'auto']}
-      tick={{ fontSize: 15, fontFamily: 'Arial', fill: '#ffffff' }}
+      tick={{ fontSize: 10, fontFamily: 'Arial', fill: '#ffffff' }}
     />
     <Tooltip />
     <Area
       type="monotone"
       dataKey="price"
       stroke="#8884d8"
+      strokeWidth={2.7}
       fill="url(#colorPrice)" // gradient fill
-      fillOpacity={2}
+      fillOpacity={1}
       dot={false}
       isAnimationActive={false}
     />
