@@ -15,19 +15,13 @@ const LandingPage = () => {
   ];
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentStat(prev => (prev + 1) % stats.length);
     }, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  
 
   const GridBackground = () => (
     <div className="fixed inset-0 z-0">
