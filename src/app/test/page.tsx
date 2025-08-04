@@ -8,22 +8,11 @@ import {
   BarChart3,
   Zap,
 } from "lucide-react";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 import GasChartEth from "@/app/gasChartEth/page";
 
 // Glassmorphic Card component (as in landing page)
-const GlassCard = ({ children, className = "", hover = true }) => (
-  <div
-    className={`
-      bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl shadow-md
-      ${hover ? "    hover:border-white/20" : ""}
-      transition-all duration-500 ease-out
-      ${className}
-    `}
-  >
-    {children}
-  </div>
-);
+import GlassCard from "@/components/GlassCard";
 
 // Grid and radial gradient background (non-interactive version)
 const GridBackground = () => (

@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Zap, TrendingUp, Wallet, Shield, Clock, BarChart3, ArrowRight, Star, Users, DollarSign, Activity } from 'lucide-react';
-import Navbar from './components/Navbar';
+import Navbar from '../components/Navbar';
 
 const LandingPage = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -21,7 +21,7 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  
+    
 
   const GridBackground = () => (
     <div className="fixed inset-0 z-0">
