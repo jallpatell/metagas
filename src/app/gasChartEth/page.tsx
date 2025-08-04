@@ -1,8 +1,8 @@
 "use client"
-import GasChart from "@/app/components/GasChart"
+import GasChart from "@/components/GasChart"
 import { useState, useEffect } from 'react'
 export default function () {
-    const [gasPrice, setGasPrice] = useState<string | null>(null);
+    const [gasPrice, setGasPrice] = useState<string | null>("56");
 
     useEffect(() => {
     const socket = new WebSocket('ws://localhost:4001');
