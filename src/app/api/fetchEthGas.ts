@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import { WebSocketServer } from 'ws'
+import { formatUnits } from 'ethers'
 import http from 'http'
 dotenv.config() 
 
@@ -50,17 +51,16 @@ async function getGasPrice(): Promise<void> {
     });
 
     const data: JsonRpcResponse = await response.json();
-
     if (!data.result) throw new Error("Invalid JSON-RPC response");
 
-    const gasPriceWei = BigInt(data.result);
-    // const gasPriceGwei = Number(gasPriceWei) / 1e9; // convert to Gwei as a float
-    // const gasPriceGweiRounded = gasPriceGwei.toFixed(9); // convert to Gwei
+    const gasPriceWei = data.result
+    const mid = formatUnits(gasPriceWei, 'gwei');
+    const gasPriceGWei = parseFloat(mid).toFixed(9);
 
-    console.log(`🚀 Ethereum Gas Price: ${gasPriceWei} Gwei`);
+    console.log(`Ethereum Gas Price: ${gasPriceGWei} Gwei`);
 
     // Send to all connected clients
-    const payload = JSON.stringify({ gasPrice: gasPriceWei });
+    const payload = JSON.stringify({ gasPrice: gasPriceGWei });
     clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
         client.send(payload);
