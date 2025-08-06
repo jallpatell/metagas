@@ -2,6 +2,7 @@
 import dotenv from 'dotenv'
 import { WebSocketServer } from 'ws'
 import http from 'http'
+import { formatUnits } from 'ethers'
 dotenv.config() 
 
 type JsonRpcRequest = {
@@ -12,7 +13,7 @@ type JsonRpcRequest = {
 };
 
 type JsonRpcResponse = {
-  jsonrpc: string;
+  jsonrpc: string; 
   id: number;
   result: string;
 };
@@ -25,11 +26,11 @@ const wss = new WebSocketServer({ server });
 const clients = new Set<WebSocket>();
 
 wss.on('connection', (ws) => {
-  console.log('🔌 Client connected');
+  console.log('🔌Client connected');
   clients.add(ws);
 
   ws.on('close', () => {
-    console.log('❌ Client disconnected');
+    console.log('❌Client disconnected');
     clients.delete(ws);
   });
 });
@@ -54,14 +55,14 @@ async function getGasPrice(): Promise<void> {
 
     if (!data.result) throw new Error("Invalid JSON-RPC response");
 
-    const gasPriceWei = BigInt(data.result);
-    const gasPriceMatic = Number(gasPriceWei) / 1e9; // convert to Gwei as a float
-    const gasPriceMaticRounded = gasPriceMatic.toFixed(9); // convert to Gwei
+    const gasPriceWei = data.result; // string in wei
+    const gasPriceGWei = formatUnits(gasPriceWei, 'gwei'); // specify 'gwei' for correct unit conversion
+    const gasPriceFixed = parseFloat(gasPriceGWei).toFixed(9);
 
-    console.log(`🚀 Polygon Gas Price: ${gasPriceMaticRounded} Gwei`);
+    console.log(`Polygon Gas Price: ${gasPriceFixed} GWei`);
 
     // Send to all connected clients
-    const payload = JSON.stringify({ gasPrice: gasPriceMaticRounded });
+    const payload = JSON.stringify({ gasPrice: gasPriceFixed });
     clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
         client.send(payload);
@@ -69,11 +70,11 @@ async function getGasPrice(): Promise<void> {
     });
 
   } catch (error) {
-    console.error("❌ Error fetching gas price:", error);
+    console.error("Error fetching gas price:", error);
   }
 }
 
-// Poll every 3 seconds
+// Poll every 1 second(s)
 setInterval(getGasPrice, 1000);
 
 // Start server
