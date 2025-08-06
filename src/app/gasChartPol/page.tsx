@@ -1,11 +1,12 @@
 "use client"
-import GasChart from "@/components/GasChart"
+import GasChart from "@/components/MainPage"
 import { useState, useEffect } from 'react'
+import polyLogo from "../../../public/assets/polygon-matic-logo.svg"
 export default function () {
     const [gasPrice, setGasPrice] = useState<string | null>(null);
 
     useEffect(() => {
-    const socket = new WebSocket('ws://localhost:4001');
+    const socket = new WebSocket('ws://localhost:4002');
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.gasPrice) {
@@ -16,11 +17,8 @@ export default function () {
   }, []);
     
     return (
-        <div className="text-3xl align-middle  h-screen flex  justify-center">
-            <div className="p-4 text-lg font-mono">
-                Current Ethereum Gas Price: {gasPrice ? `${gasPrice} Gwei` : 'Loading...'}
-            </div>
-            <GasChart gasPrice={gasPrice}/>
+        <div>
+          <GasChart gasPrice={ gasPrice } blockchainName="Polygon Labs." imageSource={"assets/polygon-matic-logo.svg"}/>
         </div>
     )
 }
