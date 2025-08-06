@@ -14,7 +14,7 @@ import GasChartEth from "./GasChart"; // ✅ FIX: move to /components or make th
 import GlassCard from "./GlassCard";
 import GridBackground from "./Grid";
 
-const TIMEFRAMES = ["Live Price Change", "Simulated Price Change"];
+const TIMEFRAMES = ["Live Price", "Simulated Price"];
 
 type StockTradingInterfaceProps = {
   gasPrice:  string | null;
@@ -31,7 +31,7 @@ type Trade = {
 };
 
 const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice, blockchainName, imageSource }) => {
-  const [activeTimeframe, setActiveTimeframe] = useState("Live Price Change");
+  const [activeTimeframe, setActiveTimeframe] = useState("Live Price");
 
   const [stockData] = useState({
     symbol: blockchainName,
@@ -49,7 +49,7 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
   const isPositive = stockData.change >= 0;
 
   return (
-    <div className="min-h-screen bg-[#131313] text-white relative ">
+    <div className="min-h-screen  bg-[#131313] text-white relative ">
       <GridBackground />
       <Navbar />
       <section className="z-10 pt-10 pb-4">
@@ -61,28 +61,36 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
         
           {/* CHART AND HEADER */}
           <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
-            <GlassCard className="p-8 w-auto">
+            <GlassCard className="p-8 w-320">
               <div className="flex flex-wrap justify-between items-center mb-8">
                 <div>
-                  <div className="flex items-center space-x-3">
-                      <Image src={imageSource} alt="My-Image" width={25} height={25} className="mb-10" />
-                    <div>
-                      <GlassCard className="p-4 ml-7 hover:scale-105 mb-10 w-auto">
-                        <h1>{blockchainName}</h1>
-                      </GlassCard>
-                    </div>
-                  </div>
-                  <div className="mt-2 font-mono text-lg flex items-baseline gap-4">
-                    <span className="text-white text-2xl font-extrabold">
+                  <div className="flex items-center align-middle bg-center space-x-3">
+                    <Image src={imageSource} alt="My-Image" width={25} height={25} className="mb-10" />
+                    <GlassCard className="p-5 ml-7 mb-8 w-50">
+                      <h1 className="flex align-middle">{blockchainName}</h1>
+                    </GlassCard>
+                    <div className="flex ml-130">
+                      <GlassCard>
+                      <div className=" font-mono text-lg flex items-baseline gap-4">
+                        <span className={`inline-flex items-center gap-1 font-bold p-8 ${isPositive ? "text-green-400" : "text-red-400"}`}>
+                          {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+                          {isPositive ? "+" : ""}
+                          {formatPrice(stockData.change)} ({isPositive ? "+" : ""}
+                          {stockData.changePercent.toFixed(2)}%)
+                        </span>
+                      </div>
+                    </GlassCard>
+                    <GlassCard className="p-8 w-70font-extrabold text-2xl ml-5">
+                        <p>Gas Price</p>
+                        <span className="text-blue-500 text-2xl font-extrabold">
                       {gasPrice}
-                    </span>
-                    <span className={`inline-flex items-center gap-1 font-semibold ${isPositive ? "text-green-400" : "text-red-400"}`}>
-                      {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
-                      {isPositive ? "+" : ""}
-                      {formatPrice(stockData.change)} ({isPositive ? "+" : ""}
-                      {stockData.changePercent.toFixed(2)}%)
-                    </span>
+                      </span>
+                    </GlassCard>
+                    </div> 
+                    
+
                   </div>
+                  
                 </div>
                 {/* OHLC */}
               </div>
@@ -91,15 +99,15 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <BarChart3 className="w-6 h-6 text-blue-300" /> Price Chart
+                    <BarChart3 className="w-6 h-6 text-blue-900" /> Price Chart
                   </h3>
-                  <div className="flex space-x-2">
+                  <div className="flex -mt-1 space-x-2">
                     {TIMEFRAMES.map((tf) => (
                       <button
                         key={tf}
                         onClick={() => setActiveTimeframe(tf)}
                         className={`
-                          px-3 py-1 rounded-2xl font-semibold text-sm transition-colors border
+                          px-3 py-1 rounded-2xl font-semibold text-sm  transition-colors border
                           ${activeTimeframe === tf
                             ? "bg-blue-500 text-white border-transparent"
                             : "bg-transparent border-white/10 text-gray-300 hover:bg-white/10"

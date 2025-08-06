@@ -69,7 +69,7 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
   }, []); // Only run once on mount
 
   return (
-    <div className="w-full h-64 p-4">
+    <div className="w-310 h-75 p-4">
 <ResponsiveContainer width="100%" height="100%">
   <AreaChart data={data}>
     <defs>
@@ -78,23 +78,23 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
         <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
       </linearGradient>
     </defs>
-    <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+    <CartesianGrid strokeDasharray="1 1" strokeOpacity={.1} />
     <XAxis
       dataKey="time"
-      tick={{ fontSize: 10, fill: '#ffffff' }}
+      tick={{ fontSize: 13,fontFamily: 'Arial', fill: '#ffffff' }}
     />
     <YAxis
       domain={['auto', 'auto']}
-      tick={{ fontSize: 10, fontFamily: 'Arial', fill: '#ffffff' }}
+      tick={{ fontSize: 13, fontFamily: 'Arial', fill: '#ffffff' }}
     />
     <Tooltip />
     <Area
       type="monotone"
       dataKey="price"
-      stroke="#8884d8"
-      strokeWidth={2.7}
-      fill="url(#colorPrice)" // gradient fill
-      fillOpacity={1}
+      stroke="#165394"
+      strokeWidth={2.0}
+      fill="url([#165394])" // gradient fill
+      fillOpacity={3}
       dot={false}
       isAnimationActive={false}
     />
