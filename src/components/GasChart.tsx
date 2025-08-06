@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   LineChart,
   AreaChart,
@@ -25,53 +25,48 @@ type GasChartProps = {
 
 export default function LivePriceChart({ gasPrice }: GasChartProps) {
   const [data, setData] = useState<DataPoint[]>(() => {
-  const now = new Date();
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { hour12: false });
-  };
-  const initial: DataPoint[] = [];
+    const now = new Date();
+    const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour12: false });
+    const initial: DataPoint[] = [];
 
-  for (let i = 14; i >= 0; i--) {
-    const time = new Date(now.getTime() - i * 1000); // 1 second apart
-    const price =
-      Math.random() * (0.5 - 0.2) + 0.2; // Random between 0.3 and 0.5
-      initial.push({
-      time: formatTime(time),
-      price: parseFloat(price.toFixed(9)),
-    });
-  }
+    for (let i = 899; i >= 0; i--) {
+      const time = new Date(now.getTime() - i * 1000);
+      const price = Math.random() * (0.8 - 0.6) + 0.6;
+      initial.push({ time: formatTime(time), price: parseFloat(price.toFixed(9)) });
+    }
 
-  return initial;
-});
+    return initial;
+  });
 
+  const gasPriceRef = useRef<string | null>(null);
+  const MAX_POINTS = 15 * 60;
 
-  const MAX_POINTS = 15 * 60; // 900 points = 15 minutes
-
-  // Format current time as HH:mm:ss
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { hour12: false });
-  };
-
-  // Push new point to the chart whenever gasPrice updates
   useEffect(() => {
-    if (!gasPrice) return;
+    gasPriceRef.current = gasPrice;
+  }, [gasPrice]);
 
-    const numericPrice = parseFloat(gasPrice);
-    if (isNaN(numericPrice)) return;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentGas = gasPriceRef.current;
+      if (!currentGas) return;
 
-    const newPoint: DataPoint = {
-      time: formatTime(new Date()),
-      price: numericPrice,
-    };
+      const numericPrice = parseFloat(currentGas);
+      if (isNaN(numericPrice)) return;
 
-    setData((prev) => {
-      const updated = [...prev, newPoint];
-      if (updated.length > MAX_POINTS) {
-        updated.shift(); // Keep only the latest MAX_POINTS
-      }
-      return updated;
-    });
-  }, [gasPrice]); // 🔁 runs every time gasPrice changes
+      const newPoint: DataPoint = {
+        time: new Date().toLocaleTimeString('en-US', { hour12: false }),
+        price: numericPrice,
+      };
+
+      setData((prev) => {
+        const updated = [...prev, newPoint];
+        if (updated.length > MAX_POINTS) updated.shift();
+        return updated;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []); // Only run once on mount
 
   return (
     <div className="w-full h-64 p-4">
