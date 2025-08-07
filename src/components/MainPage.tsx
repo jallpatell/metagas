@@ -65,9 +65,12 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
               <div className="flex flex-wrap justify-between items-center mb-8">
                 <div>
                   <div className="flex items-center align-middle bg-center space-x-3">
-                    <Image src={imageSource} alt="My-Image" width={25} height={25} className="mb-10" />
                     <GlassCard className="p-5 ml-7 mb-8 w-50">
-                      <h1 className="flex align-middle">{blockchainName}</h1>
+                      <div className="flex gap-4">
+                        <h1 className="flex align-middle">{blockchainName}</h1>
+                        <Image src={imageSource} alt="My-Image" width={15} height={15} className="mb-10 " />
+                      </div>
+                      
                     </GlassCard>
                     <div className="flex ml-130">
                       <GlassCard>
@@ -98,10 +101,7 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
               {/* CHART */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <BarChart3 className="w-6 h-6 text-blue-900" /> Price Chart
-                  </h3>
-                  <div className="flex -mt-1 space-x-2">
+                  <div className="flex ml-15 -mt-1 space-x-2">
                     {TIMEFRAMES.map((tf) => (
                       <button
                         key={tf}
