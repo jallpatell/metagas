@@ -11,8 +11,6 @@ const Navbar = () => {
                 MetaGas
               </span>
             </div>
-            
-            {/* Desktop Menu */}
             <div className="hidden md:flex font-sans font-extralight items-center space-x-8">
               <a href="#features" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-all duration-200 relative group">
                 Home
@@ -21,15 +19,12 @@ const Navbar = () => {
                 Features
               </a>
               <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-all duration-200 relative group">
+                Charts
               </a>
-              <div className="flex items-center space-x-3">
-                <button className="bg-gradient-to-r from-blue-800 to-blue-800 px-6 py-2 rounded-lg hover:from-blue-800 hover:to-blue-700 hover:scale-105 transition-all duration-900 font-medium shadow-lg shadow-blue-500/25">
-                  Live Price
-                </button>
-              </div>
+              <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-all duration-200 relative group">
+                About Me
+              </a>
             </div>
-
-            {/* Mobile Menu Button */}
           </div>
         </div>
         </nav>
