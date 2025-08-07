@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Zap, TrendingUp, Wallet, Shield, Clock, BarChart3, ArrowRight, Star, Users, DollarSign, Activity, Grid } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
+import GridBackground from '@/components/Grid';
 
 interface LiveDataCardProps {
   chain: string;
@@ -41,7 +42,7 @@ const LandingPage = () => {
 
   const GlassCard = ({ children, className = "", hover = true }) => (
     <div className={`
-      bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl
+       backdrop-blur-sm border border-white/10 rounded-xl
       ${hover ? ' hover:border-white/20 ' : ''}
       transition-all duration-500 ease-out
       ${className}
@@ -55,11 +56,12 @@ const LandingPage = () => {
 
       {/* Navigation */}
       <Navbar />
+
       {/* Hero Section */}
       <section className="relative mt-15  z-10 pt-20 ">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className=' flex'>
-            <Image src="/assets/bg_webpage.png" height={450} width={650} alt='bg' className='mr-7 -ml-40 -mt-24 ' />
+            <Image src="/assets/bg_webpage.png" height={450} width={650} alt='bg' className='mr-7  -ml-40 -mt-24 ' />
             <div  className='ml-28 mt-1'>
               <h1 className="text-5xl md:text-7xl  lg:text-6xl  font-sans -mt-10 mb-10 leading-tight">
                 <span className="bg-white font-sans bg-clip-text  text-transparent ">
@@ -130,7 +132,8 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <GlassCard className='p-10 w-200 bg-[radial-gradient(rgba(229,231,235,0.3)_1px,transparent_1px)] [background-size:16px_16px] h-180 ml-15'>
+      <div className='flex gap-8'>
+        <GlassCard className='p-10 w-200 bg-[radial-gradient(rgba(229,231,235,0.3)_1px,transparent_1px)] [background-size:16px_16px] bg-red-400/10 h-180 ml-15'>
         <h2 className="text-4xl text-[#d45f63] font-bold font-mono mb-2">Why does tracking 15-minute gas data matter?</h2>
         <p className="text-gray-300 font-mono font-extrabold text-2xl ">
             Network congestion can change rapidly throughout the day. By analyzing gas price volatility in rolling 15-minute intervals, you get actionable insights into periods of high and low on-chain activity. <br></br>This helps you:
@@ -140,56 +143,33 @@ const LandingPage = () => {
             <li>Schedule your transactions when on-chain fees are predictably lower.</li>
             <li>Save money by avoiding network rush hours—up-to-date every 15 minutes.</li>
           </ul>
-          <p className="text-gray-400 text-2xl font-bold font-mono mt-2">
-            With candlestick charting, you see not only averages, but real extremes (highs/lows) within each 15-minute window, giving you deeper control over your transaction timing.
+          <p className="text-gray-200 text-2xl font-bold font-mono mt-2">
+            With Live charting, you see not only averages, but real extremes (highs/lows) within each 15-minute window, giving you deeper control over your transaction timing.
           </p>
       </GlassCard>
+      <div>
+        <GlassCard className='w-130 h-55 bg-green-300/20 text-3xl p-5 font-mono text-green-700 font-extrabold '>
+          <h2 className=''>
+            Fetches real-time gas prices from Ethereum, Polygon, and Arbitrum using their native RPC endpoints
+          </h2>
+        </GlassCard>
+        <GlassCard className='w-130 mt-7 h-55 bg-pink-300/20 text-3xl p-5 font-mono text-pink-500 font-extrabold '>
+          <h2 className=''>
+            Real-time ETH/USD pricing via ethers.getLogs from "Uniswap V3" ETH/USDC pool ensures accurate cost calculations
+          </h2>
+        </GlassCard>
+        <GlassCard className='w-130 mt-7 h-55 bg-orange-300/20 text-3xl p-5 font-mono text-orange-700 font-extrabold '>
+          <h2 className=''>
+            Include priority fees and base fees, and handle chain-specific data structures
+          </h2>
+        </GlassCard>
+        
+      </div>
+      </div>
+      
       
       {/* How It Works */}
-      <section id="how-it-works" className="relative z-10 py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                How It Works
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400">Simple, powerful, and completely transparent</p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <GlassCard className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-bold mb-4">Connect Directly</h3>
-              <p className="text-gray-400">
-                We connect directly to Ethereum, Polygon, and Arbitrum RPC endpoints. No middlemen, no delays.
-              </p>
-            </GlassCard>
-
-            <GlassCard className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-bold mb-4">Real-Time Analysis</h3>
-              <p className="text-gray-400">
-                Advanced algorithms parse Uniswap V3 events for accurate ETH/USD pricing and gas calculations.
-              </p>
-            </GlassCard>
-
-            <GlassCard className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-bold mb-4">Smart Decisions</h3>
-              <p className="text-gray-400">
-                Get instant notifications, simulate costs, and make informed decisions before every transaction.
-              </p>
-            </GlassCard>
-          </div>
-        </div>
-      </section>
 
 
       {/* CTA Section */}
