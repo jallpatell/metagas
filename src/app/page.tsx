@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Zap, TrendingUp, Wallet, Shield, Clock, BarChart3, ArrowRight, Star, Users, DollarSign, Activity, Grid } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
-import { StringifyOptions } from 'querystring';
 
 interface LiveDataCardProps {
   chain: string;
@@ -15,10 +14,15 @@ const LandingPage = () => {
   const [mousePos, setMousePos] = useState({ x: 128, y: 300 });
   const [currentStat, setCurrentStat] = useState(0);
 
-  function LiveDataCard({ chain, price, volume, className = "" }: React.FC<LiveDataCardProps>) {
+  function LiveDataCard({ chain, price, volume }: React.FC<LiveDataCardProps>) {
   // price: current gas price, volume: 24h on-chain volume
   return (
+
     <div className="rounded-2xl ml-5 w-70 bg-white/5 border border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-105 transition-all duration-300">
+      <div className='ml-40 flex p-1'>
+        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
+      </div>
+      
       <div className="text-2xl font-bold font-mono ">{chain}</div>
 
       <div className="text-shadow-md mt-3 text-gray-300">Live Gas Price</div>
@@ -38,7 +42,7 @@ const LandingPage = () => {
   const GlassCard = ({ children, className = "", hover = true }) => (
     <div className={`
       bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl
-      ${hover ? 'hover:bg-white/7 hover:border-white/20 ' : ''}
+      ${hover ? ' hover:border-white/20 ' : ''}
       transition-all duration-500 ease-out
       ${className}
     `}>
@@ -55,7 +59,7 @@ const LandingPage = () => {
       <section className="relative mt-15  z-10 pt-20 ">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className=' flex'>
-            <Image src="/assets/bg_webpage.png" height={450} width={650} alt='bg' className='mr-7 -ml-40 -mt-30 ' />
+            <Image src="/assets/bg_webpage.png" height={450} width={650} alt='bg' className='mr-7 -ml-40 -mt-24 ' />
             <div  className='ml-28 mt-1'>
               <h1 className="text-5xl md:text-7xl  lg:text-6xl  font-sans -mt-10 mb-10 leading-tight">
                 <span className="bg-white font-sans bg-clip-text  text-transparent ">
@@ -72,12 +76,49 @@ const LandingPage = () => {
               </p>
               <div>
                 <div className='flex gap-4  -mt-6 -ml-27'>
-                  <LiveDataCard chain="Ethereum [L1]" price="12" volume="12.23B">
-                  </LiveDataCard>
-                  <LiveDataCard chain="Polygon [L2]" price="1123" volume="12.23B">
-                  </LiveDataCard>
-                  <LiveDataCard chain="Arbitrum [L3]" price="1232" volume="12.23B">
-                  </LiveDataCard>
+                  <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
+                    <div className="">
+                      <div className=' -ml-6 -mt-6 flex p-1'>
+                        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
+                      </div>
+                      <div className="text-2xl font-bold font-mono ">Ethereum (Layer1)</div>
+                      <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
+                        Live Gas Price <Image alt="blink" className='-mt-3 -ml-7' src="/assets/download.png" height={90} width={90}/>
+                      </div>
+                      <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
+                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
+                      <div className="text-sm text-gray-400">Market Volume</div>
+                     </div>
+                  </GlassCard>
+                  <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
+                    <div className="">
+                      <div className=' -ml-6 -mt-6 flex p-1'>
+                        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
+                      </div>
+                      <div className="text-2xl font-bold font-mono ">Polygon <br></br> (Layer 2)</div>
+                      <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
+                        Live Gas Price <Image alt="blink" className='-mt-3 -ml-7' src="/assets/download.png" height={90} width={90}/>
+                      </div>
+                      <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
+                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
+                      <div className="text-sm text-gray-400">Market Volume</div>
+                     </div>
+                  </GlassCard>
+                  <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
+                    <div className="">
+                      <div className=' -ml-6 -mt-6 flex p-1'>
+                        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab' className='animate-[blink_3s_ease-in-out_infinite]'/>
+                      </div>
+                      <div className="text-2xl font-bold font-mono ">Arbitrum (Layer 2)</div>
+                      <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
+                        Live Gas Price <Image alt="blink" className='-mt-3 -ml-7' src="/assets/download.png" height={90} width={90}/>
+                      </div>
+
+                      <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
+                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
+                      <div className="text-sm text-gray-400">Market Volume</div>
+                     </div>
+                  </GlassCard>
                 </div>
               </div>
             </div>
