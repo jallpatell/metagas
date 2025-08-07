@@ -1,5 +1,5 @@
 import React from 'react'
-
+import image from "next/image"
 const Navbar = () => {
   return (
     <div className=' fixed top-0 left-0    w-full z-50 '>
@@ -7,8 +7,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              
-              <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <span className="text-3xl font-sans font-extrabold hover:bg-blue-500 hover:scale-105 duration-300 delay-130 bg-white bg-clip-text text-transparent">
                 MetaGas
               </span>
             </div>
