@@ -1,5 +1,6 @@
 import React from 'react'
 import image from "next/image"
+import NavHover from "./ChartHover"
 const Navbar = () => {
   return (
     <div className=' fixed top-0 left-0    w-full z-50 '>
@@ -18,9 +19,15 @@ const Navbar = () => {
               <a href="#how-it-works" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-all duration-200 relative group">
                 Features
               </a>
-              <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-all duration-200 relative group">
-                Charts
-              </a>
+              <div className='relative group'>
+                <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105  duration-600  relative group">
+                  Charts
+                </a>
+                <div className='hidden group-hover:block'>
+                  <NavHover />
+                </div>
+              </div>
+              
               <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-all duration-200 relative group">
                 About Me
               </a>
