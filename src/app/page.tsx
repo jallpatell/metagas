@@ -4,6 +4,8 @@ import { Zap, TrendingUp, Wallet, Shield, Clock, BarChart3, ArrowRight, Star, Us
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
 import GridBackground from '@/components/Grid';
+import Footer from '@/components/Footer';
+
 
 interface LiveDataCardProps {
   chain: string;
@@ -175,24 +177,7 @@ const LandingPage = () => {
       {/* CTA Section */}
       
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/5 py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5" />
-            </div>
-            <span className="text-xl font-bold">GasTracker Pro</span>
-          </div>
-          <p className="text-gray-500 mb-6">
-            The future of gas fee optimization is here
-          </p>
-          <div className="flex justify-center space-x-8 text-gray-400">
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
-            <span>Contact</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
