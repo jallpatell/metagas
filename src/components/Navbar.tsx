@@ -20,7 +20,7 @@ const Navbar = () => {
                 Features
               </a>
               <div className='relative group'>
-                <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105  duration-600  relative group">
+                <a href="#testimonials" className="text-gray-300 hover:text-white hover:text-2xl hover:scale-105 transition-colors duration-600  relative group">
                   Charts
                 </a>
                 <div className='hidden group-hover:block'>
