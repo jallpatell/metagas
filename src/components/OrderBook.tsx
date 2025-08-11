@@ -30,29 +30,35 @@ const OrderBook: React.FC = () => {
   const [asks, setAsks] = useState<Order[]>([]);
   const [lastPrice, setLastPrice] = useState(30000);
 
-  // Initialize order book
+  // Initialize order book once on mount
   useEffect(() => {
     setBids(generateOrders("bids", 10, lastPrice));
     setAsks(generateOrders("asks", 10, lastPrice));
   }, []);
 
-  // Simulate updates every second
+  // Simulate updates every second (functional state update to avoid dependency issues)
   useEffect(() => {
     const interval = setInterval(() => {
-      const newPrice = lastPrice + randomInRange(-20, 20);
-      setLastPrice(parseFloat(newPrice.toFixed(2)));
-      setBids(generateOrders("bids", 10, newPrice));
-      setAsks(generateOrders("asks", 10, newPrice));
+      setLastPrice((prevPrice) => {
+        const newPrice = prevPrice + randomInRange(-20, 20);
+        const roundedPrice = parseFloat(newPrice.toFixed(2));
+
+        setBids(generateOrders("bids", 10, roundedPrice));
+        setAsks(generateOrders("asks", 10, roundedPrice));
+
+        return roundedPrice;
+      });
     }, 1000);
+
     return () => clearInterval(interval);
-  }, [lastPrice]);
+  }, []);
 
   return (
     <div className="p-4 bg-black text-white rounded-xl shadow-lg w-100 max-w-lg mx-auto font-mono">
       {/* Last Price */}
       <div className="text-center mb-4">
         <span className="text-gray-400 font-extralight">Last Price: </span>
-        <span className="text-2xl font-mediums">${lastPrice}</span>
+        <span className="text-2xl font-medium">${lastPrice}</span>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

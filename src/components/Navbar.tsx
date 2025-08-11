@@ -1,8 +1,7 @@
 import React from 'react'
-import image from "next/image"
 import NavHover from "./ChartHover"
 import { useRouter } from 'next/navigation'
-import { Router } from 'express'
+
 
 const Navbar = () => {
   const router = useRouter()
