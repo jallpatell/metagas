@@ -48,7 +48,7 @@ const OrderBook: React.FC = () => {
   }, [lastPrice]);
 
   return (
-    <div className="p-4 bg-[#131313] text-white rounded-xl shadow-lg w-100 max-w-lg mx-auto font-mono">
+    <div className="p-4 bg-black text-white rounded-xl shadow-lg w-100 max-w-lg mx-auto font-mono">
       {/* Last Price */}
       <div className="text-center mb-4">
         <span className="text-gray-400 font-extralight">Last Price: </span>

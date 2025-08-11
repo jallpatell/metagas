@@ -4,10 +4,11 @@ interface GlassCard {
     children: ReactNode;
     className?: string;
     hover?: boolean;
+    href?: () => void;
 }
 
 
-const GlassCard: React.FC<GlassCard> = ( { children, className = "", hover = true } ) => {
+const GlassCard: React.FC<GlassCard> = ( { children, className = "", hover = true, href } ) => {
   return (
     <div
     className={`

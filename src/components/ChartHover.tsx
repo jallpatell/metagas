@@ -2,10 +2,11 @@ import React from 'react'
 import Image from "next/image"
 
 const ChartHover = () => {
+  
   const menuItems = [
-    { label: "Ethereum Gas", link: "#price-chart", icon: "/assets/ethlogo.svg" },
-    { label: "Polygon Gas", link: "#volume-chart", icon: "/assets/polygon-matic-logo.svg" },
-    { label: "Arbitrum Gas", link: "#market-cap", icon: "/assets/arbitrum-logo.svg" },
+    { label: "Ethereum Gas", link: "/liveEth", icon: "/assets/ethlogo.svg" },
+    { label: "Polygon Gas", link: "/livePol", icon: "/assets/polygon-matic-logo.svg" },
+    { label: "Arbitrum Gas", link: "/liveArb", icon: "/assets/arbitrum-logo.svg" },
     { label: "Simulate Transactions", link: "#custom-analysis", icon: "/icons/transaction-simulate.png" },
   ];
 
