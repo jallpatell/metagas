@@ -27,6 +27,6 @@ export default function GasPage() {
   }, []);
 
   return (
-    <MainPage gasPrice={gasPrice} blockchainName="Arbitrum Gas" imageSource={arbLogo}/>
+    <MainPage gasPrice={gasPrice} blockchainName="Arbitrum" imageSource={arbLogo}/>
   );
 }

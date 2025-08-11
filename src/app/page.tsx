@@ -87,7 +87,7 @@ const LandingPage = () => {
                       </div>
                       <div className="text-2xl font-bold font-mono ">Ethereum (Layer1)</div>
                       <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
-                        Live Gas Price <Image alt="blink" className='-mt-3 -ml-7' src="/assets/download.png" height={90} width={90}/>
+                        Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
                       <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
                       <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
@@ -101,7 +101,7 @@ const LandingPage = () => {
                       </div>
                       <div className="text-2xl font-bold font-mono ">Polygon <br></br> (Layer 2)</div>
                       <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
-                        Live Gas Price <div className="w-2 h-2 ml-2 bg-green-400 rounded-full animate-pulse"></div>
+                        Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
                       <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
                       <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
@@ -115,7 +115,7 @@ const LandingPage = () => {
                       </div>
                       <div className="text-2xl font-bold font-mono ">Arbitrum (Layer 2)</div>
                       <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
-                        Live Gas Price <Image alt="blink" className='-mt-3 -ml-7' src="/assets/download.png" height={90} width={90}/>
+                        Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
 
                       <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>

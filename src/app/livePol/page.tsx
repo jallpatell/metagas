@@ -18,7 +18,7 @@ export default function () {
     
     return (
         <div>
-          <GasChart gasPrice={ gasPrice } blockchainName="Polygon Labs." imageSource={"assets/polygon-matic-logo.svg"}/>
+          <GasChart gasPrice={ gasPrice } blockchainName="Polygon" imageSource={"assets/polygon-matic-logo.svg"}/>
         </div>
     )
 }
