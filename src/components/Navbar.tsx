@@ -4,7 +4,7 @@ import NavHover from "./ChartHover"
 const Navbar = () => {
   return (
     <div className=' fixed top-0 left-0    w-full z-50 '>
-        <nav className="relative z-10 backdrop-blur-lg hover:backdrop-blur-md border-1 transition hover:scale-103 duration-500 delay-100  rounded-3xl p-0.2 mt-5 m-5 bg-black/20 border-b border-white/10">
+        <nav className="relative z-10 backdrop-blur-lg hover:backdrop-blur-md border-1 transition hover:scale-102 duration-500 delay-100  rounded-3xl p-0.2 mt-5 m-5 bg-black/20 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
