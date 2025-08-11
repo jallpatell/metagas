@@ -134,7 +134,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <div className='flex gap-8'>
+      <div id='features' className='flex gap-8'>
         <GlassCard className='p-10 w-200 bg-[radial-gradient(rgba(229,231,235,0.3)_1px,transparent_1px)] [background-size:16px_16px] bg-red-400/10 h-180 ml-15'>
         <h2 className="text-4xl text-[#d45f63] font-bold font-mono mb-2">Why does tracking 15-minute gas data matter?</h2>
         <p className="text-gray-300 font-mono font-extrabold text-2xl ">
@@ -150,7 +150,7 @@ const LandingPage = () => {
           </p>
       </GlassCard>
       <div>
-        <GlassCard className='w-130 h-55 bg-green-300/20 text-3xl p-5 font-mono text-green-700 font-extrabold '>
+        <GlassCard className='w-130 h-55 bg-amber-200/10 text-3xl p-5 font-mono text-yellow-300 font-extrabold '>
           <h2 className=''>
             Fetches real-time gas prices from Ethereum, Polygon, and Arbitrum using their native RPC endpoints
           </h2>
@@ -177,7 +177,10 @@ const LandingPage = () => {
       {/* CTA Section */}
       
       {/* Footer */}
-      <Footer />
+      <div id='aboutMe'>
+        <Footer />
+      </div>
+      
     </div>
   );
 };

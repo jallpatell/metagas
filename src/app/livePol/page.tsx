@@ -1,7 +1,7 @@
 "use client"
 import GasChart from "@/components/MainPage"
 import { useState, useEffect } from 'react'
-import polyLogo from "../../../public/assets/polygon-matic-logo.svg"
+
 export default function () {
     const [gasPrice, setGasPrice] = useState<string | null>(null);
 

@@ -6,7 +6,7 @@ import arbLogo from "../../../public/assets/arbitrum-logo.svg"
 
 export default function GasPage() {
   const [gasPrice, setGasPrice] = useState<string | null>(null);
-  const [tick, setTick] = useState(0); // trigger re-render every second
+
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:4001");
