@@ -2,7 +2,7 @@
 
 import MainPage from "@/components/MainPage";
 import { useState, useEffect } from "react";
-import ethLogo from "../../../public/assets/ethlogo.svg"
+import ethLogo from "../../../public/assets/ethlogo.png"
 
 export default function GasPage() {
   const [gasPrice, setGasPrice] = useState<string | null>(null);
@@ -27,6 +27,6 @@ export default function GasPage() {
   }, []);
 
   return (
-    <MainPage gasPrice={gasPrice} blockchainName="Ethereum Gas" imageSource={ethLogo}/>
+    <MainPage gasPrice={gasPrice} blockchainName="Ethereum Gas" imageSource={ethLogo} />
   );
 }
