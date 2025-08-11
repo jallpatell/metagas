@@ -7,7 +7,7 @@ dotenv.config()
 type JsonRpcRequest = {
   jsonrpc: string;
   method: string;
-  params: any[];
+  params: string[];
   id: number;
 };
 
