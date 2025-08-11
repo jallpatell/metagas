@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { createChart, AreaSeries, Time } from 'lightweight-charts';
-import GlassCard from './GlassCard'; // ✅ Import GlassCard
+
 
 type GasChartProps = {
   gasPrice: string | null;
