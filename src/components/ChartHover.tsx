@@ -1,23 +1,31 @@
 import React from 'react'
+import Image from "next/image"
 
 const ChartHover = () => {
   const menuItems = [
-    { label: "Ethereum Gas", link: "#price-chart" },
-    { label: "Polygon Gas", link: "#volume-chart" },
-    { label: "Arbitrum Gas", link: "#market-cap" },
-    { label: "Simulate Transactions", link: "#custom-analysis" },
+    { label: "Ethereum Gas", link: "#price-chart", icon: "/assets/ethlogo.svg" },
+    { label: "Polygon Gas", link: "#volume-chart", icon: "/assets/polygon-matic-logo.svg" },
+    { label: "Arbitrum Gas", link: "#market-cap", icon: "/assets/arbitrum-logo.svg" },
+    { label: "Simulate Transactions", link: "#custom-analysis", icon: "/icons/transaction-simulate.png" },
   ];
 
   return (
-    <div className="absolute top-full left-0 mt-2 w-48 bg-black text-white rounded-lg shadow-lg border border-white/10 z-50">
+    <div className="absolute top-full left-0 mt-1 w-48 bg-black text-white rounded-lg shadow-lg border border-white/10 z-50">
       <ul className="flex flex-col">
         {menuItems.map((item, index) => (
-          <li key={index} className='hover:text-blue-500'>
+          <li key={index}>
             <a
               href={item.link}
-              className="block px-4 py-2 hover:bg-white/10 transition-colors duration-900"
+              className="flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors duration-200"
             >
-              {item.label}
+              <Image
+                src={item.icon}
+                alt={item.label}
+                width={18}
+                height={18}
+                className="object-contain"
+              />
+              <span>{item.label}</span>
             </a>
           </li>
         ))}
