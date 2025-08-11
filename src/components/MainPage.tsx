@@ -29,13 +29,6 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
     changePercent: 1.35,
   });
 
-  const formatPrice = (price: number | string | null | undefined): string => {
-    const num = typeof price === "number" ? price : Number(price ?? 0);
-    return num.toFixed(9);
-  };
-
-  const isPositive = stockData.change >= 0;
-
   return (
     <div className="min-h-screen bg-black text-white relative">
       <Navbar />
