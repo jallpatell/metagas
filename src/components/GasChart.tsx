@@ -1,45 +1,63 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import {
-  LineChart,
-  AreaChart,
-  Area,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-
-type DataPoint = {
-  time: string; // HH:mm:ss
-  price: number;
-};
+import { useEffect, useRef } from 'react';
+import { createChart, AreaSeries, Time } from 'lightweight-charts';
+import GlassCard from './GlassCard'; // ✅ Import GlassCard
 
 type GasChartProps = {
   gasPrice: string | null;
 };
 
-
 export default function LivePriceChart({ gasPrice }: GasChartProps) {
-  const [data, setData] = useState<DataPoint[]>(() => {
-    const now = new Date();
-    const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour12: false });
-    const initial: DataPoint[] = [];
-
-    for (let i = 899; i >= 0; i--) {
-      const time = new Date(now.getTime() - i * 1000);
-      const price = Math.random() * (0.8 - 0.6) + 0.6;
-      initial.push({ time: formatTime(time), price: parseFloat(price.toFixed(9)) });
-    }
-
-    return initial;
-  });
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  const seriesRef = useRef<any>(null);
   const gasPriceRef = useRef<string | null>(null);
-  const MAX_POINTS = 15 * 60;
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const chart = createChart(containerRef.current, {
+      layout: {
+        background: { type: 'solid', color: 'transparent' },
+        textColor: '#fff',
+      },
+      grid: {
+        vertLines: { color: 'rgba(255,255,255,0.05)' },
+        horzLines: { color: 'rgba(255,255,255,0.05)' },
+      },
+      rightPriceScale: { borderVisible: false },
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: true },
+    });
+
+    const areaSeries = chart.addSeries(AreaSeries, {
+      topColor: 'rgba(22, 83, 148, 0.4)',
+      bottomColor: 'rgba(22, 83, 148, 0)',
+      lineColor: '#165394',
+      lineWidth: 2,
+    });
+
+    seriesRef.current = areaSeries;
+
+    const now = Math.floor(Date.now() / 1000);
+    const initData = Array.from({ length: 900 }, (_, i) => {
+      const t = now - (900 - i);
+      const v = Math.random() * (0.8 - 0.6) + 0.6;
+      return { time: t as Time, value: parseFloat(v.toFixed(9)) };
+    });
+
+    areaSeries.setData(initData);
+
+    const handleResize = () => {
+      chart.applyOptions({ width: containerRef.current?.clientWidth || 0 });
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      chart.remove();
+    };
+  }, []);
 
   useEffect(() => {
     gasPriceRef.current = gasPrice;
@@ -47,60 +65,21 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentGas = gasPriceRef.current;
-      if (!currentGas) return;
-
-      const numericPrice = parseFloat(currentGas);
-      if (isNaN(numericPrice)) return;
-
-      const newPoint: DataPoint = {
-        time: new Date().toLocaleTimeString('en-US', { hour12: false }),
-        price: numericPrice,
-      };
-
-      setData((prev) => {
-        const updated = [...prev, newPoint];
-        if (updated.length > MAX_POINTS) updated.shift();
-        return updated;
+      if (!gasPriceRef.current || !seriesRef.current) return;
+      const price = parseFloat(gasPriceRef.current);
+      if (isNaN(price)) return;
+      seriesRef.current.update({
+        time: Math.floor(Date.now() / 1000) as Time,
+        value: price,
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []); // Only run once on mount
+  }, []);
 
   return (
-    <div className="w-310 h-75 p-4">
-<ResponsiveContainer width="100%" height="100%">
-  <AreaChart data={data}>
-    <defs>
-      <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.4} />
-        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-      </linearGradient>
-    </defs>
-    <CartesianGrid strokeDasharray="1 1" strokeOpacity={.1} />
-    <XAxis
-      dataKey="time"
-      tick={{ fontSize: 13,fontFamily: 'Arial', fill: '#ffffff' }}
-    />
-    <YAxis
-      domain={['auto', 'auto']}
-      tick={{ fontSize: 13, fontFamily: 'Arial', fill: '#ffffff' }}
-    />
-    <Tooltip />
-    <Area
-      type="monotone"
-      dataKey="price"
-      stroke="#165394"
-      strokeWidth={2.0}
-      fill="url([#165394])" // gradient fill
-      fillOpacity={3}
-      dot={false}
-      isAnimationActive={false}
-    />
-  </AreaChart>
-</ResponsiveContainer>
-
+    <div className="p-4 w-full h-[320px] scale-100 h-40 sm:h-[400px] lg:h-[500px]">
+      <div ref={containerRef} className="w-full h-full mt-7 rounded-xl" />
     </div>
   );
 }
