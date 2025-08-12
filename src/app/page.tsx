@@ -4,13 +4,6 @@ import Navbar from '../components/Navbar';
 import Image from 'next/image';
 import Footer from '@/components/Footer';
 
-
-interface LiveDataCardProps {
-  chain: string;
-  price: string;
-  volume: string
-}
-
 const LandingPage = () => {
   const GlassCard = ({ children, className = "", hover = true }) => (
     <div className={`
