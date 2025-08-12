@@ -10,7 +10,11 @@ type Order = {
 const randomInRange = (min: number, max: number, decimals = 2) =>
   parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
 
-const generateOrders = (type: "bids" | "asks", count: number, basePrice: number): Order[] => {
+const generateOrders = (
+  type: "bids" | "asks",
+  count: number,
+  basePrice: number
+): Order[] => {
   const orders: Order[] = [];
   for (let i = 0; i < count; i++) {
     const price =
@@ -30,23 +34,18 @@ const OrderBook: React.FC = () => {
   const [asks, setAsks] = useState<Order[]>([]);
   const [lastPrice, setLastPrice] = useState(30000);
 
-  // Initialize order book once on mount
+  // Initialize and update order book whenever lastPrice changes
   useEffect(() => {
     setBids(generateOrders("bids", 10, lastPrice));
     setAsks(generateOrders("asks", 10, lastPrice));
-  }, []);
+  }, [lastPrice]); // ✅ Added lastPrice as dependency
 
-  // Simulate updates every second (functional state update to avoid dependency issues)
+  // Simulate price updates every second
   useEffect(() => {
     const interval = setInterval(() => {
       setLastPrice((prevPrice) => {
         const newPrice = prevPrice + randomInRange(-20, 20);
-        const roundedPrice = parseFloat(newPrice.toFixed(2));
-
-        setBids(generateOrders("bids", 10, roundedPrice));
-        setAsks(generateOrders("asks", 10, roundedPrice));
-
-        return roundedPrice;
+        return parseFloat(newPrice.toFixed(2));
       });
     }, 1000);
 
