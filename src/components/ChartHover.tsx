@@ -6,7 +6,6 @@ const ChartHover = () => {
   const menuItems = [
     { label: "Ethereum Gas", link: "/liveEth", icon: "/assets/ethlogo.svg" },
     { label: "Polygon Gas", link: "/livePol", icon: "/assets/polygon-matic-logo.svg" },
-    { label: "Arbitrum Gas", link: "/liveArb", icon: "/assets/arbitrum-logo.svg" },
     { label: "Simulate Transactions", link: "#custom-analysis", icon: "/icons/transaction-simulate.png" },
   ];
 
