@@ -3,6 +3,9 @@
 
 MetaGas is a real-time Ethereum gas price dashboard built with Next.js and WebSocket technology. It provides live updates of gas prices streamed from a backend WebSocket server to a React client interface.
 
+
+You might like to check outputs in ```public/ops``` until beta version is deployed.
+
 ## Features
 
 - Real-time gas price updates using WebSocket
@@ -33,6 +36,4 @@ MetaGas is a real-time Ethereum gas price dashboard built with Next.js and WebSo
    cd metagas
    ```
 
-![Realtime Charts](public/ops/Screenshot 2025-08-12 at 14.25.23.png)
-1[](public/ops/Screenshot 2025-08-12 at 14.25.23.png)
 
