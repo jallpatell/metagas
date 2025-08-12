@@ -13,22 +13,7 @@ type StockTradingInterfaceProps = {
   imageSource: string;
 };
 
-type Trade = {
-  id: string;
-  time: string;
-  price: number;
-  size: number;
-  side: "buy" | "sell";
-};
-
 const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice, blockchainName, imageSource }) => {
-  const [activeTimeframe, setActiveTimeframe] = useState("Live Price");
-  const [stockData] = useState({
-    symbol: blockchainName,
-    change: 0.000000176,
-    changePercent: 1.35,
-  });
-
   return (
     <div className="min-h-screen bg-black text-white relative">
       <Navbar />
