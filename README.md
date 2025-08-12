@@ -26,9 +26,13 @@ MetaGas is a real-time Ethereum gas price dashboard built with Next.js and WebSo
 - npm or yarn package manager
 
 ### Installation
-
-1. Clone the repository:
+ Clone the repository:
 
    ```bash
    git clone https://github.com/yourusername/metagas.git
    cd metagas
+   ```
+
+![Realtime Charts](public/ops/Screenshot 2025-08-12 at 14.25.23.png)
+1[](public/ops/Screenshot 2025-08-12 at 14.25.23.png)
+
