@@ -2,7 +2,7 @@
 import GasChart from "@/components/MainPage"
 import { useState, useEffect } from 'react'
 
-export default function () {
+export default function GasPage() {
     const [gasPrice, setGasPrice] = useState<string | null>(null);
 
     useEffect(() => {

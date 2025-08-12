@@ -1,9 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Zap, TrendingUp, Wallet, Shield, Clock, BarChart3, ArrowRight, Star, Users, DollarSign, Activity, Grid } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
-import GridBackground from '@/components/Grid';
 import Footer from '@/components/Footer';
 
 
@@ -14,34 +12,6 @@ interface LiveDataCardProps {
 }
 
 const LandingPage = () => {
-  const [mousePos, setMousePos] = useState({ x: 128, y: 300 });
-  const [currentStat, setCurrentStat] = useState(0);
-
-  function LiveDataCard({ chain, price, volume }: React.FC<LiveDataCardProps>) {
-  // price: current gas price, volume: 24h on-chain volume
-  return (
-
-    <div className="rounded-2xl ml-5 w-70 bg-white/5 border border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-105 transition-all duration-300">
-      <div className='ml-40 flex p-1'>
-        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
-      </div>
-      
-      <div className="text-2xl font-bold font-mono ">{chain}</div>
-
-      <div className="text-shadow-md mt-3 text-gray-300">Live Gas Price</div>
-      <div className="text-3xl mb-5 font-mono text-blue-400">{price ?? "..."}</div>
-      
-      <div className="text-lg mt-5 -mb-1 text-purple-400">{volume ?? "..."}</div>
-      <div className="text-sm text-gray-400">Market Volume</div>
-
-      
-    </div>
-  );
-}
-
-
-
-
   const GlassCard = ({ children, className = "", hover = true }) => (
     <div className={`
        backdrop-blur-sm border border-white/10 rounded-xl

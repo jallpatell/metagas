@@ -4,7 +4,7 @@ import MainPage from "@/components/MainPage";
 import { useState, useEffect } from "react";
 import arbLogo from "../../../public/assets/arbitrum-logo.svg"
 
-export default function GasPage() {
+export default function liveArb() {
   const [gasPrice, setGasPrice] = useState<string | null>(null);
 
 
