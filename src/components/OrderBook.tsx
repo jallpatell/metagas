@@ -47,7 +47,7 @@ const OrderBook: React.FC = () => {
         const newPrice = prevPrice + randomInRange(-20, 20);
         return parseFloat(newPrice.toFixed(2));
       });
-    }, 1000);
+    }, 500);
 
     return () => clearInterval(interval);
   }, []);
