@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import http from "http";
 import { formatUnits } from "ethers";
-import { createClient } from "redis";
+
 
 dotenv.config();
 
@@ -31,16 +31,7 @@ const wss = new WebSocketServer({ server });
 
 const clients = new Set<WebSocket>();
 
-// Setup Redis client
-const redisClient = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
-});
 
-redisClient.on("error", (err) => console.error("Redis Client Error", err));
-
-async function connectRedis() {
-  if (!redisClient.isOpen) await redisClient.connect();
-}
 
 // WebSocket connection handling
 wss.on("connection", (ws) => {
@@ -72,8 +63,6 @@ async function getGasPrice(): Promise<void> {
   };
 
   try {
-    // Ensure Redis is connected
-    await connectRedis();
 
     // Fetch gas price from Polygon RPC
     const response = await fetch(url, {
@@ -94,10 +83,6 @@ async function getGasPrice(): Promise<void> {
 
     console.log(`Polygon Gas Price: ${gasPriceFixed} GWei`);
 
-    // Cache latest gas price in Redis with TTL 15 mins
-    await redisClient.set(CACHE_KEY, gasPriceFixed, {
-      EX: CACHE_TTL_SECONDS,
-    });
 
     // Broadcast to connected clients
     broadcastGasPrice(gasPriceFixed);

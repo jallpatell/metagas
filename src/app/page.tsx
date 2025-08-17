@@ -52,8 +52,8 @@ const LandingPage = () => {
                       <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
                         Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
-                      <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
-                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
+                      <div className="text-3xl mb-5 font-mono text-blue-400">04.323 GWei</div>
+                      <div className="text-lg mt-5 -mb-1 text-purple-400">$67.23B</div>
                       <div className="text-sm text-gray-400">Market Volume</div>
                      </div>
                   </GlassCard>
@@ -66,8 +66,8 @@ const LandingPage = () => {
                       <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
                         Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
-                      <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
-                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
+                      <div className="text-3xl mb-5 font-mono text-blue-400">29.23 GWei</div>
+                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23M</div>
                       <div className="text-sm text-gray-400">Market Volume</div>
                      </div>
                   </GlassCard>
@@ -80,9 +80,8 @@ const LandingPage = () => {
                       <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
                         Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
-
-                      <div className="text-3xl mb-5 font-mono text-blue-400">23.23 GWei</div>
-                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23B</div>
+                      <div className="text-3xl mb-5 font-mono text-blue-400">0.923 GWei</div>
+                      <div className="text-lg mt-5 -mb-1 text-purple-400">$1.273B</div>
                       <div className="text-sm text-gray-400">Market Volume</div>
                      </div>
                   </GlassCard>
@@ -120,7 +119,7 @@ const LandingPage = () => {
         </GlassCard>
         <GlassCard className='w-130 mt-7 h-55 bg-pink-300/20 text-3xl p-5 font-mono text-pink-500 font-extrabold '>
           <h2 className=''>
-            Real-time ETH/USD pricing via ethers.getLogs from "Uniswap V3" ETH/USDC pool ensures accurate cost calculations
+            Real-time ETH/USD pricing via ethers.getLogs from "Uniswap V3" ETH/USDC pool ensures accurate calculations
           </h2>
         </GlassCard>
         <GlassCard className='w-130 mt-7 h-55 bg-orange-300/20 text-3xl p-5 font-mono text-orange-700 font-extrabold '>

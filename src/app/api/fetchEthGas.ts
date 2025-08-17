@@ -14,7 +14,7 @@ wss.on("connection", (ws: WebSocket) => {
   });
 
   ws.on("close", () => {
-    console.log("❌ Client disconnected");
+    console.log(" ♾️ Client disconnected");
     clients.delete(ws);
   });
 });
