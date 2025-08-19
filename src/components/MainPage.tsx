@@ -6,6 +6,7 @@ import GasChartEth from "./GasChart";
 import OrderBook from "./OrderBook";
 import GlassCard from "./GlassCard";
 import Footer from "./Footer";
+import CryptoList from "./CryptoList";
 
 type StockTradingInterfaceProps = {
   gasPrice: string | null;
@@ -32,19 +33,19 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
                     <div className="flex bg-black p-2 gap-4 rounded-xl">
                       <div className="rounded-xl p-2 bg-blue-400/20">
                         <h2 className="text-xl ml-4 font-light font-mono text-gray-500">Gas</h2>
-                        <h2 className="font-sans font-bold text-xl text-blue-400 ml-4">{gasPrice}</h2>
+                        <h2 className="font-sans font-bold text-xl text-blue-400 ml-4">00.70 Wei</h2>
                       </div>
                       <div className="rounded-xl p-2 bg-green-300/20">
                         <h2 className="text-xl ml-4 font-light font-mono text-gray-500">24H High</h2>
-                        <h2 className="font-sans font-bold text-xl text-green-400 ml-4">24H Price</h2>
+                        <h2 className="font-sans font-bold text-xl text-green-400 ml-4">$4384.74</h2>
                       </div>
                       <div className="bg-red-400/20 rounded-xl p-2">
                         <h2 className="text-xl ml-4 font-light font-mono text-gray-500">24H Low</h2>
-                        <h2 className="font-sans font-bold text-xl text-red-400 ml-4">24L Price</h2>
+                        <h2 className="font-sans font-bold text-xl text-red-400 ml-4">$4206.20</h2>
                       </div>
                       <div className="bg-blue-400/20 rounded-xl p-2">
                         <h2 className="text-xl ml-4 font-light font-mono text-gray-500">{ blockchainName }</h2>
-                        <h2 className="font-sans font-extrabold text-xl text-blue-400 ml-4">{gasPrice}</h2>
+                        <h2 className="font-sans font-extrabold text-xl text-blue-400 ml-4">$4290.20</h2>
                       </div>
                     </div> 
                   </div>
@@ -62,7 +63,13 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
               </div>
               <OrderBook />
           </div>
+          
         </div>
+      </section>
+      <section>
+        <div className="bg-#131313">
+            <CryptoList />
+          </div>
       </section>
       <Footer />
     </div>
