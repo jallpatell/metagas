@@ -14,6 +14,10 @@ You might like to check chart interfaces app provides in ```public/ops``` until 
 - Clean and responsive UI with live Ethereum gas price display
 - Easy to extend for additional blockchain support
 
+
+![App Screenshot](public/assets/SCR-20250819-opao.png)
+
+
 ## Project Structure
 
 - `src/app/api/fetchEthGas.ts`: Backend WebSocket server that broadcasts Ethereum gas prices to connected clients.
