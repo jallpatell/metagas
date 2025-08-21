@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.85.5",
     "axios": "^1.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",

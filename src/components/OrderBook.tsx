@@ -32,7 +32,7 @@ const generateOrders = (
 const OrderBook: React.FC = () => {
   const [bids, setBids] = useState<Order[]>([]);
   const [asks, setAsks] = useState<Order[]>([]);
-  const [lastPrice, setLastPrice] = useState(30000);
+  const [lastPrice, setLastPrice] = useState(4200);
 
   // Initialize and update order book whenever lastPrice changes
   useEffect(() => {
