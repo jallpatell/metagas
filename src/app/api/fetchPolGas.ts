@@ -1,6 +1,4 @@
-"use client"; // Actually this is server-side, so remove "use client" in real usage
-
-import dotenv from "dotenv";
+ximport dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import http from "http";
 import { formatUnits } from "ethers";
