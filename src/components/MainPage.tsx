@@ -30,7 +30,7 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
                       <Image src={imageSource} alt="logo" width={45} height={45}/>
                       <h1 className="font-medium text-gray-300 ml-3 font-mono mt-6 text-4xl">{blockchainName}</h1>
                     </div>
-                    <div className="flex bg-black p-2 gap-3  rounded-xl mr-30">
+                    <div className="flex bg-black p-2 gap-3  rounded-xl ">
                       <div className="rounded-xl p-2 bg-blue-400/20">
                         <h2 className="text-xl ml-4 font-light font-mono text-gray-500">Gas</h2>
                         <h2 className="font-sans font-bold text-xl text-blue-400 ml-4">00.70 Wei</h2>
