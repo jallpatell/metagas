@@ -16,21 +16,21 @@ type StockTradingInterfaceProps = {
 
 const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice, blockchainName, imageSource }) => {
   return (
-    <div className="min-h-screen bg-black text-white relative">
+    <div className="min-h-screen bg-[#141414] text-white relative">
       <Navbar />
-      <section className="z-10 max-w-7xl  mx-auto px-6 mt-5s py-6">
+      <section className="z-10 max-w-7xl mt-0 h mx-auto px-6 mt-5s py-6">
         <div className="grid grid-cols-1 mt-20 lg:grid-cols-10 gap-8">
           {/* CHART AND HEADER */}
           <div className="items-center col-span-1 lg:col-span-7 flex flex-col gap-6">
             <div className="p-8 w-full">
-              <GlassCard className="p-3 mr-20 -ml-32 mb-5 bg-black -mt-10 w-240">
+              <GlassCard className=" mr-20 -ml-32 mb-5 bg-black -mt-9 h-23 w-355">
                 <div className="">
                   <div className="flex text-3xl font-extralight justify-between">
-                    <div className="flex gap-5">
+                    <div className="flex ml-30 gap-5">
                       <Image src={imageSource} alt="logo" width={45} height={45}/>
-                      <h1 className="font-extrabold font-mono mt-6 text-3xl">{blockchainName}</h1>
+                      <h1 className="font-medium text-gray-300 ml-3 font-mono mt-6 text-4xl">{blockchainName}</h1>
                     </div>
-                    <div className="flex bg-black p-2 gap-4 rounded-xl">
+                    <div className="flex bg-black p-2 gap-3  rounded-xl mr-30">
                       <div className="rounded-xl p-2 bg-blue-400/20">
                         <h2 className="text-xl ml-4 font-light font-mono text-gray-500">Gas</h2>
                         <h2 className="font-sans font-bold text-xl text-blue-400 ml-4">00.70 Wei</h2>
@@ -51,14 +51,14 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({ gasPrice,
                   </div>
                 </div>
               </GlassCard>
-              <div className="w-230 -ml-30 -mt-10">
+              <div className="w-240 h-130 bg-black rounded-xl -ml-30">
                 <GasChartEth gasPrice={gasPrice} />
               </div>
             </div>
           </div>
 
           {/* ORDER BOOK - Added this new section */}
-          <div className="col-span-1 lg:col-span-3">
+          <div className="col-span-1 mt-28 lg:col-span-3">
               <div className="flex items-center justify-between mb-4">
               </div>
               <OrderBook />

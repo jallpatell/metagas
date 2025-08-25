@@ -10,7 +10,7 @@ type GasChartProps = {
 
 export default function LivePriceChart({ gasPrice }: GasChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const seriesRef = useRef<any>(null);
+  const seriesRef = useRef<any | string>(null);
   const gasPriceRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
   }, []);
 
   return (
-    <div className="p-4 w-full h-[320px] scale-100 h-40 sm:h-[400px] lg:h-[500px]">
+    <div className="p-4 w-full rounded-4xl h-[220px] scale-100 h-40 sm:h-[400px] lg:h-[500px]">
       <div ref={containerRef} className="w-full h-full mt-7 rounded-xl" />
     </div>
   );

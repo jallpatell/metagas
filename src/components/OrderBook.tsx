@@ -53,14 +53,14 @@ const OrderBook: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-4 bg-black text-white rounded-xl shadow-lg w-100 max-w-lg mx-auto font-mono">
+    <div className="p-4 bg-black text-white rounded-xl shadow-lg w-110 h-130 -mt-6 max-w-lg mx-auto font-mono">
       {/* Last Price */}
       <div className="text-center mb-4">
         <span className="text-gray-400 font-extralight">Last Price: </span>
         <span className="text-2xl font-medium">${lastPrice}</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 mt-10 gap-4">
         {/* Asks */}
         <div>
           <h3 className="text-red-400 font-semibold mb-2">Asks</h3>
