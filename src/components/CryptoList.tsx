@@ -45,7 +45,7 @@ const CryptoListInner = () => {
       >
         <td className="py-3 px-4">
           <div className="flex items-center gap-3">
-            <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+            <img src={crypto.image} alt={crypto.name}  className=" w-8 h-8 rounded-full" />
             <div>
               <p className="font-medium">{crypto.name}</p>
               <p className="text-sm text-gray-400">{crypto.symbol.toUpperCase()}</p>

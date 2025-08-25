@@ -23,8 +23,6 @@ type JsonRpcResponse = {
 
 const url = process.env.POL_NODE_URL!;
 const PORT = 4002;
-const CACHE_KEY = "polygonGasPrice";
-const CACHE_TTL_SECONDS = 900; // 15 mins
 
 const server = http.createServer();
 const wss = new WebSocketServer({ server });

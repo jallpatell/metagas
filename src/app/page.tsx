@@ -1,5 +1,4 @@
 "use client"
-import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
 import Footer from '@/components/Footer';
@@ -119,7 +118,7 @@ const LandingPage = () => {
         </GlassCard>
         <GlassCard className='w-130 mt-7 h-55 bg-pink-300/20 text-3xl p-5 font-mono text-pink-500 font-extrabold '>
           <h2 className=''>
-            Real-time ETH/USD pricing via ethers.getLogs from "Uniswap V3" ETH/USDC pool ensures accurate calculations
+            Real-time ETH/USD pricing via ethers.getLogs from &#34;Uniswap V3&quot;  ETH/USDC pool ensures accurate calculations
           </h2>
         </GlassCard>
         <GlassCard className='w-130 mt-7 h-55 bg-orange-300/20 text-3xl p-5 font-mono text-orange-700 font-extrabold '>
