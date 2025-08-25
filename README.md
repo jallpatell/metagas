@@ -17,6 +17,11 @@ MetaGas is a real-time Ethereum gas price dashboard built with Next.js and WebSo
 
 ![App Screenshot](public/assets/SCR-20250819-opao.png)
 
+#### Getting Started
+1. Clone this repo
+2. Configure redis in src/app/api/fetch<chainName>.ts files
+3. Configure & set-up websocket url to connect frontend & backend.
+4. good to go, (send me review)
 
 ## Project Structure
 
@@ -24,13 +29,6 @@ MetaGas is a real-time Ethereum gas price dashboard built with Next.js and WebSo
 - `src/app/page.tsx` (or `GasPage.tsx`): React client component that connects to the WebSocket server and displays live gas prices.
 - `public/assets/ethlogo.svg`: Ethereum logo used in the client UI.
 - `components/MainPage.tsx`: Main UI component that shows the gas price and related info.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher recommended)
-- npm or yarn package manager
 
 ### Installation
  Clone the repository:
