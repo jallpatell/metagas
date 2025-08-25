@@ -49,7 +49,7 @@ const CryptoListInner = () => {
             </tr>
           </thead>
           <tbody>
-            {cryptos?.map((crypto, idx) => (
+            {cryptos?.map((crypto: Crypto, idx: number) => (
               <tr
                 key={crypto.symbol}
                 className={`transition-colors rounded-4xl  duration-300 cursor-pointer ${

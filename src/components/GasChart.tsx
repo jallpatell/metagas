@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { createChart, AreaSeries, Time } from 'lightweight-charts';
-
+import { createChart, ISeriesApi, AreaSeries, Time } from 'lightweight-charts';
 
 type GasChartProps = {
   gasPrice: string | null;
@@ -10,7 +9,7 @@ type GasChartProps = {
 
 export default function LivePriceChart({ gasPrice }: GasChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const seriesRef = useRef<any | string>(null);
+  const seriesRef = useRef<ISeriesApi<'Area'> | null>(null);
   const gasPriceRef = useRef<string | null>(null);
 
   useEffect(() => {
