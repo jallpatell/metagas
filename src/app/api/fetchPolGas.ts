@@ -26,9 +26,6 @@ const server = http.createServer();
 const wss = new WebSocketServer({ server });
 
 const clients = new Set<WebSocket>();
-
-
-
 // WebSocket connection handling
 wss.on("connection", (ws) => {
   console.log("🔌 Client connected");
