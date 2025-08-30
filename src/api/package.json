@@ -4,7 +4,9 @@
   "description": "",
   "main": "fetchGas.js",
   "scripts": {
-    "start": "ts-node fetchGas.ts"
+    "build": "tsc",
+    "start": "node dist/fetchGas.js",
+    "dev": "ts-node fetchGas.ts"
   },
   "keywords": [],
   "author": "",
