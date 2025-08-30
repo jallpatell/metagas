@@ -48,7 +48,7 @@ wss.on('connection', (ws: WebSocket) => {
   console.log('🔌 Client connected');
   clients.add(ws);
 
-  ws.on('message', (message) => {
+  ws.on('message', (message: WebSocket.RawData) => {
     console.log('Received:', message.toString());
   });
 
