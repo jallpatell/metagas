@@ -105,9 +105,9 @@ async function getGasPrices(): Promise<GasPriceData> {
   try {
     // Fetch all gas prices in parallel
     const [arbitrum, ethereum, polygon] = await Promise.all([
-      fetchGasPrice('Arbitrum', ARB_URL),
+      fetchGasPrice('Arbitrum', ARB_URL!),
       fetchGasPrice('Ethereum', ETH_URL),
-      fetchGasPrice('Polygon', POL_URL)
+      fetchGasPrice('Polygon', POL_URL!)
     ]);
 
     return {
