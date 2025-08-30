@@ -23,13 +23,10 @@ const wss = new ws_1.WebSocketServer({ server });
 const clients = new Set();
 // WebSocket connection handling
 wss.on('connection', (ws) => {
-    console.log('🔌 Client connected');
     clients.add(ws);
     ws.on('message', (message) => {
-        console.log('Received:', message.toString());
     });
     ws.on('close', () => {
-        console.log('Client disconnected');
         clients.delete(ws);
     });
     // Send initial data on connection
@@ -65,7 +62,6 @@ async function fetchGasPrice(chain, url) {
         return parseFloat((0, ethers_1.formatUnits)(data.result, 'gwei')).toFixed(9);
     }
     catch (error) {
-        console.error(`Error fetching ${chain} gas price:`, error);
         return "0"; // Return a default value or handle error as needed
     }
 }
@@ -86,7 +82,6 @@ async function getGasPrices() {
         };
     }
     catch (error) {
-        console.error('Error fetching gas prices:', error);
         return {
             arbitrum: "0",
             ethereum: "0",
@@ -108,26 +103,19 @@ function broadcastGasPrices(data) {
 async function pollGasPrices() {
     try {
         const gasPrices = await getGasPrices();
-        console.log(`Gas Prices - Arbitrum: ${gasPrices.arbitrum} Gwei, Ethereum: ${gasPrices.ethereum} Gwei, Polygon: ${gasPrices.polygon} Gwei`);
         broadcastGasPrices(gasPrices);
     }
-    catch (error) {
-        console.error('Error in pollGasPrices:', error);
-    }
+    catch { }
 }
 // Start polling
 setInterval(pollGasPrices, POLL_INTERVAL);
 // Start WebSocket server
 server.listen(PORT, () => {
-    console.log(`Consolidated WebSocket server running at ws://localhost:${PORT}`);
-    console.log('Polling gas prices every second...');
 });
 // Graceful shutdown
 process.on('SIGINT', () => {
-    console.log('Shutting down server...');
     clients.forEach(client => client.close());
     server.close(() => {
-        console.log('Server closed');
         process.exit(0);
     });
 });

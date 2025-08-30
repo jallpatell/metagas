@@ -138,7 +138,7 @@ async function pollGasPrices() {
   try {
     const gasPrices = await getGasPrices();
     broadcastGasPrices(gasPrices);
-  } 
+  } catch{}
 }
 
 // Start polling
