@@ -56,7 +56,7 @@ const LoadingSkeleton: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+            <div className="text-gray-500 text-4xl">Might take a few seconds to load for first time. Please wait. Sorry for the inconvenience.</div>
             {/* Chart Container Skeleton */}
             <div className="w-full bg-black rounded-xl p-4 border border-gray-800">
               <div className="w-full h-72 sm:h-80 md:h-96 lg:h-[420px] bg-gray-900 rounded-lg animate-pulse">
@@ -66,7 +66,7 @@ const LoadingSkeleton: React.FC = () => {
                       key={i} 
                       className="w-8 md:w-12 bg-gray-700 rounded-t"
                       style={{ height: `${30 + (i * 10)}%` }}
-                    ></div>
+                    > </div>
                   ))}
                 </div>
               </div>
