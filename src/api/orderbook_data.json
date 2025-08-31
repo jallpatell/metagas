@@ -1,0 +1,180 @@
+{
+  "ethusdt": {
+    "symbol": "ethusdt",
+    "asks": [
+      {
+        "price": 3200.19,
+        "amount": 49.8
+      },
+      {
+        "price": 3200.39,
+        "amount": 43.25
+      },
+      {
+        "price": 3200.59,
+        "amount": 12.71
+      },
+      {
+        "price": 3200.79,
+        "amount": 56.81
+      },
+      {
+        "price": 3200.99,
+        "amount": 59.13
+      },
+      {
+        "price": 3201.19,
+        "amount": 41.76
+      },
+      {
+        "price": 3201.39,
+        "amount": 51.29
+      },
+      {
+        "price": 3201.59,
+        "amount": 51.94
+      },
+      {
+        "price": 3201.79,
+        "amount": 36.02
+      },
+      {
+        "price": 3201.99,
+        "amount": 20.83
+      }
+    ],
+    "bids": [
+      {
+        "price": 3199.79,
+        "amount": 44.27
+      },
+      {
+        "price": 3199.59,
+        "amount": 16.55
+      },
+      {
+        "price": 3199.39,
+        "amount": 34.41
+      },
+      {
+        "price": 3199.19,
+        "amount": 22.44
+      },
+      {
+        "price": 3198.99,
+        "amount": 43.89
+      },
+      {
+        "price": 3198.79,
+        "amount": 34.59
+      },
+      {
+        "price": 3198.59,
+        "amount": 18.84
+      },
+      {
+        "price": 3198.39,
+        "amount": 48
+      },
+      {
+        "price": 3198.19,
+        "amount": 39.46
+      },
+      {
+        "price": 3197.99,
+        "amount": 29.38
+      }
+    ],
+    "lastPrice": 3199.99,
+    "timestamp": 1756651352103
+  },
+  "maticusdt": {
+    "symbol": "maticusdt",
+    "asks": [
+      {
+        "price": 0.8501,
+        "amount": 46301.99
+      },
+      {
+        "price": 0.8502,
+        "amount": 21667.67
+      },
+      {
+        "price": 0.8503,
+        "amount": 68982.87
+      },
+      {
+        "price": 0.8504,
+        "amount": 80340.7
+      },
+      {
+        "price": 0.8505,
+        "amount": 39278.59
+      },
+      {
+        "price": 0.8506,
+        "amount": 73019.78
+      },
+      {
+        "price": 0.8507,
+        "amount": 17653.7
+      },
+      {
+        "price": 0.8508,
+        "amount": 84966.01
+      },
+      {
+        "price": 0.8509,
+        "amount": 61207.89
+      },
+      {
+        "price": 0.851,
+        "amount": 30796.17
+      }
+    ],
+    "bids": [
+      {
+        "price": 0.8499,
+        "amount": 95623.07
+      },
+      {
+        "price": 0.8498,
+        "amount": 12063.29
+      },
+      {
+        "price": 0.8497,
+        "amount": 27705.9
+      },
+      {
+        "price": 0.8496,
+        "amount": 94972.75
+      },
+      {
+        "price": 0.8495,
+        "amount": 23040.85
+      },
+      {
+        "price": 0.8494,
+        "amount": 67060.8
+      },
+      {
+        "price": 0.8493,
+        "amount": 92055.3
+      },
+      {
+        "price": 0.8492,
+        "amount": 72845.75
+      },
+      {
+        "price": 0.8491,
+        "amount": 56867.3
+      },
+      {
+        "price": 0.849,
+        "amount": 23415.82
+      }
+    ],
+    "lastPrice": 0.85,
+    "timestamp": 1756651352104
+  }
+}

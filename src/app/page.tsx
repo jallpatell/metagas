@@ -1,6 +1,7 @@
 "use client"
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
+import Link from 'next/link';
 import Footer from '@/components/Footer';
 
 const LandingPage = () => {
@@ -42,48 +43,54 @@ const LandingPage = () => {
               </p>
               <div>
                 <div className='flex gap-4  -mt-6 -ml-27'>
-                  <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
-                    <div className="">
-                      <div className=' -ml-6 -mt-6 flex p-1'>
-                        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
-                      </div>
-                      <div className="text-2xl font-bold font-mono ">Ethereum (Layer1)</div>
-                      <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
-                        Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
-                      </div>
-                      <div className="text-3xl mb-5 font-mono text-blue-400">04.323 GWei</div>
-                      <div className="text-lg mt-5 -mb-1 text-purple-400">$67.23B</div>
-                      <div className="text-sm text-gray-400">Market Volume</div>
-                     </div>
-                  </GlassCard>
-                  <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
-                    <div className="">
-                      <div className=' -ml-6 -mt-6 flex p-1'>
-                        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
-                      </div>
-                      <div className="text-2xl font-bold font-mono ">Polygon <br></br> (Layer 2)</div>
-                      <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
-                        Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
-                      </div>
-                      <div className="text-3xl mb-5 font-mono text-blue-400">29.23 GWei</div>
-                      <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23M</div>
-                      <div className="text-sm text-gray-400">Market Volume</div>
-                     </div>
-                  </GlassCard>
-                  <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
-                    <div className="">
-                      <div className=' -ml-6 -mt-6 flex p-1'>
-                        <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab' className='animate-[blink_3s_ease-in-out_infinite]'/>
-                      </div>
-                      <div className="text-2xl font-bold font-mono ">Arbitrum (Layer 2)</div>
-                      <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
-                        Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
-                      </div>
-                      <div className="text-3xl mb-5 font-mono text-blue-400">0.923 GWei</div>
-                      <div className="text-lg mt-5 -mb-1 text-purple-400">$1.273B</div>
-                      <div className="text-sm text-gray-400">Market Volume</div>
-                     </div>
-                  </GlassCard>
+                                     <Link href="/liveEth">
+                     <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
+                       <div className="">
+                         <div className=' -ml-6 -mt-6 flex p-1'>
+                           <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
+                         </div>
+                         <div className="text-2xl font-bold font-mono ">Ethereum (Layer1)</div>
+                         <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
+                           Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
+                         </div>
+                         <div className="text-3xl mb-5 font-mono text-blue-400">04.323 GWei</div>
+                         <div className="text-lg mt-5 -mb-1 text-purple-400">$67.23B</div>
+                         <div className="text-sm text-gray-400">Market Volume</div>
+                        </div>
+                     </GlassCard>
+                   </Link>
+                                     <Link href="/livePol">
+                     <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
+                       <div className="">
+                         <div className=' -ml-6 -mt-6 flex p-1'>
+                           <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
+                         </div>
+                         <div className="text-2xl font-bold font-mono ">Polygon <br></br> (Layer 2)</div>
+                         <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
+                           Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
+                         </div>
+                         <div className="text-3xl mb-5 font-mono text-blue-400">29.23 GWei</div>
+                         <div className="text-lg mt-5 -mb-1 text-purple-400">$231.23M</div>
+                         <div className="text-sm text-gray-400">Market Volume</div>
+                        </div>
+                     </GlassCard>
+                   </Link>
+                                     <Link href="/liveArb">
+                     <GlassCard className="ml-5 w-70 border-white/10 p-8 flex flex-col items-center space-y-2 shadow hover:bg-blue-400/20 hover:scale-102 transition-all duration-900">
+                       <div className="">
+                         <div className=' -ml-6 -mt-6 flex p-1'>
+                           <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab' className='animate-[blink_3s_ease-in-out_infinite]'/>
+                         </div>
+                         <div className="text-2xl font-bold font-mono ">Arbitrum (Layer 2)</div>
+                         <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
+                           Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
+                         </div>
+                         <div className="text-3xl mb-5 font-mono text-blue-400">0.923 GWei</div>
+                         <div className="text-lg mt-5 -mb-1 text-purple-400">$1.273B</div>
+                         <div className="text-sm text-gray-400">Market Volume</div>
+                        </div>
+                     </GlassCard>
+                   </Link>
                 </div>
               </div>
             </div>
