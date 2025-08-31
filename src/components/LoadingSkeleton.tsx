@@ -1,111 +1,156 @@
+"use client";
 import React from "react";
 
 const LoadingSkeleton: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-[#141414] text-white relative overflow-x-hidden">
-      {/* Navbar Placeholder - Static */}
-      <div className="h-16 bg-gray-800 w-full mb-6"></div>
-
-      <main className="pt-28 pb-10 px-4 sm:px-6 w-full max-w-full overflow-x-hidden">
-        <div className="flex flex-col lg:flex-row gap-2 lg:gap-2">
-          {/* CHART AND HEADER SKELETON (col-span-7) */}
-          <div className="flex-1 flex flex-col gap-2 min-w-0">
-            {/* Header Card Placeholder */}
-            <div className="w-full bg-black p-4 sm:p-6 rounded-xl">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  {/* Image Placeholder */}
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-700 rounded-full animate-pulse"></div>
-                  {/* Blockchain Name Placeholder */}
-                  <div className="h-8 w-32 bg-gray-700 rounded animate-pulse"></div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full sm:w-auto">
-                  {/* Gas Price Placeholder - Blinking blue */}
-                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-0">
-                    <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">Gas</h2>
-                    <div className="h-4 w-16 bg-blue-400 rounded animate-pulse"></div>
-                  </div>
-                  {/* 24H High Placeholder - Blinking green */}
-                  <div className="rounded-lg p-2 bg-green-300/20 min-w-0">
-                    <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">24H High</h2>
-                    <div className="h-4 w-20 bg-green-400 rounded animate-pulse"></div>
-                  </div>
-                  {/* 24H Low Placeholder - Blinking red */}
-                  <div className="rounded-lg p-2 bg-red-400/20 min-w-0">
-                    <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">24H Low</h2>
-                    <div className="h-4 w-20 bg-red-400 rounded animate-pulse"></div>
-                  </div>
-                  {/* Blockchain Value Placeholder - Blinking blue */}
-                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-0">
-                    <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">Blockchain</h2>
-                    <div className="h-4 w-20 bg-blue-400 rounded animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Chart Container Placeholder */}
-            <div className="w-full bg-black rounded-xl p-4">
-              <div className="w-full h-72 sm:h-80 md:h-96 lg:h-[420px] bg-gray-800 rounded animate-pulse"></div>
-            </div>
-          </div>
-
-          {/* ORDER BOOK SKELETON (col-span-3) */}
-          <div className="w-full mt-6 lg:w-80 xl:w-96 flex-shrink-0">
-            <div className="p-4 bg-black rounded-xl shadow-lg font-mono">
-              {/* Last Price Placeholder - Blinking cyan */}
-              <div className="text-center bg-cyan-400/20 p-2 rounded-lg mb-4">
-                <span className="text-gray-400 font-extralight">Last Price: </span>
-                <div className="h-5 w-24 inline-block bg-cyan-400 rounded animate-pulse ml-2"></div>
-              </div>
-
-              <div className="grid grid-cols-2 mt-3 gap-4">
-                {/* Asks Placeholder */}
-                <div>
-                  <h3 className="text-red-400 font-semibold mb-2">Asks</h3>
-                  <div className="space-y-1">
-                    {[...Array(10)].map((_, idx) => (
-                      <div key={idx} className="flex justify-between text-sm bg-red-900/30 p-1 rounded">
-                        <div className="h-4 w-16 bg-red-400 rounded animate-pulse"></div>
-                        <div className="h-4 w-12 bg-red-400 rounded animate-pulse"></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bids Placeholder */}
-                <div>
-                  <h3 className="text-green-400 font-semibold mb-2">Bids</h3>
-                  <div className="space-y-1">
-                    {[...Array(10)].map((_, idx) => (
-                      <div key={idx} className="flex justify-between text-sm bg-green-900/30 p-1 rounded">
-                        <div className="h-4 w-16 bg-green-400 rounded animate-pulse"></div>
-                        <div className="h-4 w-12 bg-green-400 rounded animate-pulse"></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Chain Data Placeholder */}
-          <div className="bg-black h-30 mt-2 lg:w-95 rounded-xl animate-pulse">
-
+      {/* Navbar Skeleton (static) */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-gray-800 p-4">
+        <div className="flex justify-between items-center">
+          <div className="h-8 w-40 bg-gray-700 rounded"></div>
+          <div className="flex gap-4">
+            <div className="h-10 w-10 bg-gray-700 rounded-full"></div>
+            <div className="h-10 w-10 bg-gray-700 rounded-full"></div>
           </div>
         </div>
-
-        {/* Crypto List Section Placeholder */}
-        <section className="mt-6 -ml-13">
-          <div className="bg-[#131313] rounded-xl p-4 sm:p-6">
-            <div className="h-72 bg-gray-800 rounded-xl animate-pulse"></div>
+      </div>
+      
+      {/* Main content skeleton */}
+      <main className="pt-28 pb-10 px-4 sm:px-6 w-full max-w-full overflow-x-hidden">
+        <div className="flex flex-col lg:flex-row gap-2 lg:gap-2">
+          
+          {/* CHART AND HEADER SECTION */}
+          <div className="flex-1 flex flex-col gap-2 min-w-0">
+            {/* Header Card Skeleton */}
+            <div className="w-full bg-black p-4 sm:p-6 rounded-xl border border-gray-800">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-full animate-pulse"></div>
+                  <div className="h-8 w-40 bg-gray-800 rounded animate-pulse"></div>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full sm:w-auto">
+                  {/* Gas Price Skeleton */}
+                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-0">
+                    <div className="h-4 w-12 bg-gray-700 rounded mb-1"></div>
+                    <div className="h-6 w-16 bg-blue-400/40 rounded animate-pulse"></div>
+                  </div>
+                  
+                  {/* 24H High Skeleton */}
+                  <div className="rounded-lg p-2 bg-green-300/20 min-w-0">
+                    <div className="h-4 w-16 bg-gray-700 rounded mb-1"></div>
+                    <div className="h-6 w-20 bg-green-400/40 rounded animate-pulse"></div>
+                  </div>
+                  
+                  {/* 24H Low Skeleton */}
+                  <div className="rounded-lg p-2 bg-red-400/20 min-w-0">
+                    <div className="h-4 w-14 bg-gray-700 rounded mb-1"></div>
+                    <div className="h-6 w-20 bg-red-400/40 rounded animate-pulse"></div>
+                  </div>
+                  
+                  {/* Price Skeleton */}
+                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-0">
+                    <div className="h-4 w-20 bg-gray-700 rounded mb-1"></div>
+                    <div className="h-6 w-20 bg-blue-400/40 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Chart Container Skeleton */}
+            <div className="w-full bg-black rounded-xl p-4 border border-gray-800">
+              <div className="w-full h-72 sm:h-80 md:h-96 lg:h-[420px] bg-gray-900 rounded-lg animate-pulse">
+                <div className="h-full flex items-end justify-between px-4 pb-4">
+                  {[...Array(6)].map((_, i) => (
+                    <div 
+                      key={i} 
+                      className="w-8 md:w-12 bg-gray-700 rounded-t"
+                      style={{ height: `${30 + (i * 10)}%` }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
-      </main>
 
-      {/* Footer Placeholder - Static */}
-      <div className="h-16 bg-gray-800 w-full mt-6"></div>
+          {/* ORDER BOOK SECTION */}
+          <div className="w-full mt-6 lg:w-80 xl:w-96 flex-shrink-0">
+            <div className="bg-black/50 backdrop-blur-md rounded-xl border border-gray-800 overflow-hidden">
+              {/* Order Book Header */}
+              <div className="p-4 border-b border-gray-800">
+                <div className="h-6 w-40 bg-gray-800 rounded mx-auto mb-2"></div>
+                <div className="flex justify-between items-center">
+                  <div className="h-8 w-24 bg-gray-800 rounded"></div>
+                  <div className="h-10 w-24 bg-cyan-400/20 rounded-lg flex items-center justify-center">
+                    <div className="h-6 w-16 bg-cyan-400/40 rounded animate-pulse"></div>
+                  </div>
+                  <div className="h-8 w-24 bg-gray-800 rounded"></div>
+                </div>
+              </div>
+              
+              {/* Order Book Columns */}
+              <div className="grid grid-cols-3 text-xs text-gray-500 py-2 border-b border-gray-800 px-4">
+                <div className="text-left">Price</div>
+                <div className="text-center">Size</div>
+                <div className="text-right">Total</div>
+              </div>
+              
+              {/* Bids Skeleton */}
+              <div className="max-h-60 overflow-y-auto">
+                {[...Array(5)].map((_, i) => (
+                  <div key={`bid-${i}`} className="grid grid-cols-3 text-sm px-4 py-1.5 hover:bg-gray-900/50 transition-colors">
+                    <div className="text-left">
+                      <div className="h-5 w-16 bg-green-400/40 rounded animate-pulse"></div>
+                    </div>
+                    <div className="text-center">
+                      <div className="h-5 w-12 bg-gray-700 rounded mx-auto"></div>
+                    </div>
+                    <div className="text-right">
+                      <div className="h-5 w-14 bg-gray-700 rounded ml-auto"></div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Asks Skeleton */}
+                {[...Array(5)].map((_, i) => (
+                  <div key={`ask-${i}`} className="grid grid-cols-3 text-sm px-4 py-1.5 hover:bg-gray-900/50 transition-colors">
+                    <div className="text-left">
+                      <div className="h-5 w-16 bg-red-400/40 rounded animate-pulse"></div>
+                    </div>
+                    <div className="text-center">
+                      <div className="h-5 w-12 bg-gray-700 rounded mx-auto"></div>
+                    </div>
+                    <div className="text-right">
+                      <div className="h-5 w-14 bg-gray-700 rounded ml-auto"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Chain Data Skeleton */}
+            <div className="bg-black h-30 mt-2 rounded-xl border border-gray-800 p-4">
+              <div className="h-6 w-32 bg-gray-800 rounded mb-3"></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="h-5 w-full bg-gray-800 rounded animate-pulse"></div>
+                <div className="h-5 w-full bg-gray-800 rounded animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      {/* Footer Skeleton (static) */}
+      <div className="-mt-17 bg-black/80 backdrop-blur-md border-t border-gray-800 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="h-6 w-48 bg-gray-800 rounded mx-auto mb-4"></div>
+          <div className="flex justify-center gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-10 w-10 bg-gray-800 rounded-full"></div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
