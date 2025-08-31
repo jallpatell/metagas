@@ -165,9 +165,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         <span className="text-xl font-medium text-cyan-400">
           ${lastPrice !== null ? lastPrice : "Loading..."}
         </span>
-        {isUsingBoilerplate && (
-          <div className="text-xs text-yellow-400 mt-1">Live</div>
-        )}
+
       </div>
 
       <div className="grid grid-cols-2 mt-3 gap-4">
