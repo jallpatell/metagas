@@ -166,7 +166,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
           ${lastPrice !== null ? lastPrice : "Loading..."}
         </span>
         {isUsingBoilerplate && (
-          <div className="text-xs text-yellow-400 mt-1">Live data loading...</div>
+          <div className="text-xs text-yellow-400 mt-1">Live</div>
         )}
       </div>
 
