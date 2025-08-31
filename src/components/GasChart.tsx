@@ -17,7 +17,7 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
 
     const chart = createChart(containerRef.current, {
       layout: {
-        background: { type: 'solid', color: 'transparent' },
+        background: { color: 'transparent' },
         textColor: '#fff',
       },
       grid: {

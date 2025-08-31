@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Footer from '@/components/Footer';
 
 const LandingPage = () => {
-  const GlassCard = ({ children, className = "", hover = true }) => (
+  const GlassCard = ({ children, className = "", hover = true }: { children: React.ReactNode; className?: string; hover?: boolean }) => (
     <div className={`
        backdrop-blur-sm border border-white/10 rounded-xl
       ${hover ? ' hover:border-white/20 ' : ''}

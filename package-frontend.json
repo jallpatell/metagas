@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "node build-frontend.js",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -16,7 +16,7 @@
     "lightweight-charts": "^5.0.8",
     "lucide-react": "^0.534.0",
     "next": "15.4.2",
-    "react": "^19.1.0",
+    "react": "^19.1.1",
     "react-dom": "^19.1.0",
     "recharts": "^3.1.0",
     "socket.io-client": "^4.8.1",

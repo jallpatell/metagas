@@ -26,13 +26,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
   const [lastPrice, setLastPrice] = useState<number | null>(null);
 
   useEffect(() => {
-    let ws: WebSocket;
     const symbol = blockchainName === "Ethereum" ? "ethusdt" : "maticusdt";
     // Binance depth stream uses @depth which is a partial book update. For a full book, we'd need @depth@100ms or similar.
     // However, the standard @depth stream sends incremental updates which we need to process.
     const wsUrl = `wss://stream.binance.com:9443/ws/${symbol}@depth`;
 
-    ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log(`WebSocket connected for ${symbol}`);

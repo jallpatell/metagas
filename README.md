@@ -1,37 +1,95 @@
+# MetaGas - Real-Time Cross-Chain Gas Tracker
 
-# MetaGas
-Real-time cross-chain gas tracker for Web3. Monitor ```Ethereum```, ```Polygon```, and ```Arbitrum``` with configured ```redis``` cache, with precision timing using ```websockets```.
-## Features
-- Real-time gas price updates using WebSocket
-- Backend server implemented with Node.js and the `ws` WebSocket library
-- React client built with Next.js using React hooks
-- Clean and responsive UI with live Ethereum gas price display
-- Easy to extend for additional blockchain support
+A modern Web3 application for tracking gas prices across Ethereum, Polygon, and Arbitrum networks in real-time.
 
-#### Getting Started
-1. Clone this repo
-2. Configure redis in src/app/api/fetch<chainName>.ts files
-3. Configure & set-up websocket url to connect frontend & backend.
-4. good to go, (send me review)
+## 🚀 Quick Deploy to Vercel
 
-## Project Structure
+The frontend is configured for easy deployment on Vercel:
 
-- `src/app/api/fetchEthGas.ts`: Backend WebSocket server that broadcasts Ethereum gas prices to connected clients.
-- `src/app/page.tsx` (or `GasPage.tsx`): React client component that connects to the WebSocket server and displays live gas prices.
-- `public/assets/ethlogo.svg`: Ethereum logo used in the client UI.
-- `components/MainPage.tsx`: Main UI component that shows the gas price and related info.
+```bash
+# Deploy using the provided script
+./deploy.sh
 
-### Installation
- Clone the repository:
+# Or deploy manually
+npm run build
+vercel --prod
+```
 
-   ```bash
-   git clone https://github.com/jallpatell/metagas.git
-   cd metagas
-   ```
+## 📁 Project Structure
 
+```
+metagas/
+├── src/
+│   ├── app/           # Next.js frontend (deploy to Vercel)
+│   ├── components/    # React components
+│   ├── utils/         # Frontend utilities
+│   └── api/           # Backend (separate deployment)
+├── public/            # Static assets
+├── package.json       # Frontend dependencies
+├── vercel.json        # Vercel configuration
+├── build-frontend.js  # Frontend build script
+└── deploy.sh          # Deployment automation
+```
 
-![Landing Page](public/assets/SCR-20250819-oplt.png)
-![App Screenshot](public/assets/SCR-20250819-opao.png)
+## 🛠️ Development
+
+### Frontend (Next.js)
+```bash
+npm install
+npm run dev
+```
+
+### Backend (Separate)
+The backend is deployed separately at `wss://metagas.onrender.com/`
+
+## 🌐 Deployment
+
+### Frontend (Vercel)
+- **Framework**: Next.js 15.4.2
+- **Build Command**: `node build-frontend.js`
+- **Output Directory**: `.next`
+- **Runtime**: Node.js 18.x
+
+### Backend (Render)
+- **URL**: `wss://metagas.onrender.com/`
+- **Protocol**: WebSocket
+- **Data**: Real-time gas prices
+
+## 🔧 Configuration
+
+### Environment Variables
+- Frontend connects to backend via WebSocket
+- No additional environment variables required for frontend
+
+### Build Process
+The build script (`build-frontend.js`) automatically:
+1. Temporarily moves backend files out of the way
+2. Builds the frontend
+3. Restores backend files
+4. Ensures clean separation between frontend and backend
+
+## 📊 Features
+
+- **Real-time Gas Tracking**: Live gas prices for Ethereum, Polygon, and Arbitrum
+- **Cross-chain Comparison**: Compare gas prices across different networks
+- **Interactive Charts**: Visual representation of gas price trends
+- **Order Book Integration**: Real-time market depth data
+- **Responsive Design**: Works on desktop and mobile
+
+## 🔗 API Integration
+
+The frontend connects to the backend via WebSocket:
+- **WebSocket URL**: `wss://metagas.onrender.com/`
+- **Data Format**: JSON with gas prices and timestamps
+- **Update Frequency**: Real-time updates
+
+## 🚀 Deployment Guide
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+## 📝 License
+
+MIT License
 
 
 
