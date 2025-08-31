@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "node build-frontend.js",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
