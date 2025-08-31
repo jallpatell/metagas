@@ -10,7 +10,7 @@ const ChartHover = () => {
   ];
 
   return (
-    <div className="absolute top-full left-0 mt-1 w-48 bg-black text-white rounded-lg shadow-lg border border-white/10 z-50">
+    <div className="absolute top-full left-0 -mt-1 w-48 bg-black text-white rounded-lg shadow-lg border border-white/10 z-50">
       <ul className="flex flex-col">
         {menuItems.map((item, index) => (
           <li key={index}>
