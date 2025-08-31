@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { formatUnits } from "ethers";
+import './orderbookService'; // Start the order book service
 
 dotenv.config();
 
@@ -27,6 +28,28 @@ type GasPriceData = {
   timestamp: number;
 };
 
+type OrderBookData = {
+  symbol: string;
+  bids: [string, string][];
+  asks: [string, string][];
+  timestamp: number;
+};
+
+type OrderBookMessage = {
+  type: 'orderbook';
+  data: OrderBookData;
+};
+
+type GasPriceMessage = {
+  type: 'gasprice';
+  data: GasPriceData;
+};
+
+type ClientMessage = {
+  type: 'subscribe_orderbook';
+  symbol: string;
+};
+
 // Config
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 const POLL_INTERVAL = 1000;
@@ -42,6 +65,10 @@ if (!ARB_URL || !POL_URL) {
   );
 }
 
+// Server-side order book storage
+const orderBookDataMap = new Map<string, OrderBookData>();
+const orderBookConnections = new Map<string, Set<WebSocket>>();
+
 // Express setup
 const app = express();
 app.get("/", (_, res) => {
@@ -54,16 +81,60 @@ const clients = new Set<WebSocket>();
 
 // WebSocket connection handling
 wss.on("connection", (ws: WebSocket) => {
+  console.log("🔄 New WebSocket client connected");
   clients.add(ws);
 
-  ws.on("close", () => {
-    clients.delete(ws);
+  ws.on("message", (message: string) => {
+    console.log("📨 Received message from client:", message);
+    try {
+      const data: ClientMessage = JSON.parse(message);
+      if (data.type === 'subscribe_orderbook') {
+        console.log(`📊 Client subscribed to order book for ${data.symbol}`);
+        // Subscribe client to order book updates for specific symbol
+        if (!orderBookConnections.has(data.symbol)) {
+          orderBookConnections.set(data.symbol, new Set());
+        }
+        orderBookConnections.get(data.symbol)!.add(ws);
+        
+        // Send current order book data if available
+        const currentData = orderBookDataMap.get(data.symbol);
+        if (currentData) {
+          console.log(`📤 Sending current order book data for ${data.symbol}`);
+          ws.send(JSON.stringify({
+            type: 'orderbook',
+            data: currentData
+          }));
+        } else {
+          console.log(`⚠️ No current order book data available for ${data.symbol}`);
+        }
+      }
+    } catch (error) {
+      console.error("❌ Error parsing client message:", error);
+      console.error("Raw message:", message);
+    }
   });
 
-  // Send initial data
+  ws.on("close", () => {
+    console.log("🔌 WebSocket client disconnected");
+    clients.delete(ws);
+    // Remove client from all order book subscriptions
+    orderBookConnections.forEach((connections, symbol) => {
+      connections.delete(ws);
+    });
+  });
+
+  ws.on("error", (error) => {
+    console.error("❌ WebSocket error:", error);
+  });
+
+  // Send initial gas price data
   getGasPrices().then((data) => {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(data));
+      console.log("📤 Sending initial gas price data to client");
+      ws.send(JSON.stringify({
+        type: 'gasprice',
+        data: data
+      }));
     }
   });
 });
@@ -125,9 +196,12 @@ async function getGasPrices(): Promise<GasPriceData> {
   }
 }
 
-// Broadcast to all clients
+// Broadcast gas prices to all clients
 function broadcastGasPrices(data: GasPriceData) {
-  const payload = JSON.stringify(data);
+  const payload = JSON.stringify({
+    type: 'gasprice',
+    data: data
+  });
   clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(payload);
@@ -135,7 +209,40 @@ function broadcastGasPrices(data: GasPriceData) {
   });
 }
 
-// Poll prices
+// Broadcast order book data to subscribed clients
+function broadcastOrderBook(symbol: string, data: OrderBookData) {
+  const payload = JSON.stringify({
+    type: 'orderbook',
+    data: data
+  });
+  
+  const connections = orderBookConnections.get(symbol);
+  if (connections) {
+    connections.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(payload);
+      }
+    });
+  }
+}
+
+// Update order book data and broadcast to all subscribed clients
+function updateOrderBook(symbol: string, bids: [string, string][], asks: [string, string][]) {
+  const orderBookData: OrderBookData = {
+    symbol,
+    bids,
+    asks,
+    timestamp: Date.now()
+  };
+  
+  // Store the data server-side
+  orderBookDataMap.set(symbol, orderBookData);
+  
+  // Broadcast to all subscribed clients
+  broadcastOrderBook(symbol, orderBookData);
+}
+
+// Poll gas prices
 async function pollGasPrices() {
   try {
     const gasPrices = await getGasPrices();
@@ -143,11 +250,27 @@ async function pollGasPrices() {
   } catch {}
 }
 
+// Initialize order book connections for each blockchain
+function initializeOrderBookConnections() {
+  const symbols = ['ethusdt', 'maticusdt', 'arbusdt'];
+  
+  symbols.forEach(symbol => {
+    if (!orderBookConnections.has(symbol)) {
+      orderBookConnections.set(symbol, new Set());
+    }
+  });
+}
+
+// Start polling
 setInterval(pollGasPrices, POLL_INTERVAL);
+
+// Initialize order book connections
+initializeOrderBookConnections();
 
 // Start server
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+  console.log(`📊 Order book data will be shared across all clients`);
 });
 
 // Graceful shutdown
@@ -155,3 +278,6 @@ process.on("SIGINT", () => {
   clients.forEach((client) => client.close());
   server.close(() => process.exit(0));
 });
+
+// Export for external use (e.g., from Binance WebSocket)
+export { updateOrderBook };
