@@ -24,7 +24,7 @@ const LandingPage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative mt-15  z-10 pt-20 ">
+      <section className="relative mt-25  z-10 pt-20 ">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className=' flex'>
             <Image src="/assets/bg_webpage.png" height={450} width={650} alt='bg' className='mr-7  -ml-40 -mt-24 ' />
