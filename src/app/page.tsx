@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
+import CryptoList from '@/components/CryptoList';
 
 const LandingPage = () => {
   const GlassCard = ({ children, className = "", hover = true }: { children: React.ReactNode; className?: string; hover?: boolean }) => (
@@ -103,9 +104,9 @@ const LandingPage = () => {
 
       {/* Features Section */}
       <div id='features' className='flex gap-8'>
-        <GlassCard className='p-10 w-200 bg-[radial-gradient(rgba(229,231,235,0.3)_1px,transparent_1px)] [background-size:16px_16px] bg-red-400/10 h-180 ml-15'>
-        <h2 className="text-4xl text-[#d45f63] font-bold font-mono mb-2">Why does tracking 15-minute gas data matter?</h2>
-        <p className="text-gray-300 font-mono font-extrabold text-2xl ">
+        <GlassCard className='p-10 w-200 bg-[radial-gradient(rgba(229,231,235,0.3)_1px,transparent_1px)] [background-size:16px_16px] bg-red-400/10 h-140 ml-15'>
+        <h2 className="text-xl text-[#d45f63] font-bold font-mono mb-2">Why  tracking gas price matter?</h2>
+        <p className="text-gray-300 font-mono font-extrabold text-xl ">
             Network congestion can change rapidly throughout the day. By analyzing gas price volatility in rolling 15-minute intervals, you get actionable insights into periods of high and low on-chain activity. <br></br>This helps you:
           </p>
           <ul className="list-disc font-extrabold text-left my-3 font-mono text-xl  pl-6 text-gray-200 space-y-1">
@@ -113,38 +114,34 @@ const LandingPage = () => {
             <li>Schedule your transactions when on-chain fees are predictably lower.</li>
             <li>Save money by avoiding network rush hours—up-to-date every 15 minutes.</li>
           </ul>
-          <p className="text-gray-200 text-2xl font-bold font-mono mt-2">
+          <p className="text-gray-200 text-xl font-bold font-mono mt-2">
             With Live charting, you see not only averages, but real extremes (highs/lows) within each 15-minute window, giving you deeper control over your transaction timing.
           </p>
       </GlassCard>
       <div>
-        <GlassCard className='w-130 h-55 bg-amber-200/10 text-3xl p-5 font-mono text-yellow-300 font-extrabold '>
+        <GlassCard className='w-130 h-35 bg-amber-200/10 text-xl p-5 font-mono text-yellow-300 font-extrabold '>
           <h2 className=''>
             Fetches real-time gas prices from Ethereum, Polygon, and Arbitrum using their native RPC endpoints
           </h2>
         </GlassCard>
-        <GlassCard className='w-130 mt-7 h-55 bg-pink-300/20 text-3xl p-5 font-mono text-pink-500 font-extrabold '>
+        
+        <GlassCard className='w-130 mt-7 h-45 bg-orange-300/20 text-xl p-5 font-mono text-orange-700 font-extrabold '>
           <h2 className=''>
-            Real-time ETH/USD pricing via ethers.getLogs from &#34;Uniswap V3&quot;  ETH/USDC pool ensures accurate calculations
+            Includes priority fees and base fees, and handle chain-specific data structures.<br></br> Order Book Integration – Track real-time market depth.
           </h2>
         </GlassCard>
-        <GlassCard className='w-130 mt-7 h-55 bg-orange-300/20 text-3xl p-5 font-mono text-orange-700 font-extrabold '>
+        
+        <GlassCard className='w-130 mt-7 h-45 bg-pink-300/20 text-xl p-5 font-mono text-pink-500 font-extrabold mb-30'>
           <h2 className=''>
-            Include priority fees and base fees, and handle chain-specific data structures
+            Real-time Visual representation of gas price trends from Main-Net Nodes & Track real-time market depth.
           </h2>
         </GlassCard>
         
       </div>
       </div>
-      
-      
-      {/* How It Works */}
-
-
-
-      {/* CTA Section */}
-      
-      {/* Footer */}
+      <div mt-60>
+        <CryptoList />
+      </div>
       <div id='aboutMe'>
         <Footer />
       </div>
