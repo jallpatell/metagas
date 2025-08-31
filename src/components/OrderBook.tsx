@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 // Types for the order book entries
 type Order = {
@@ -6,14 +6,16 @@ type Order = {
   amount: number;
 };
 
-type BinanceDepthStreamMessage = {
-  e: string; // Event type
-  E: number; // Event time
-  s: string; // Symbol
-  U: number; // First update ID in event
-  u: number; // Final update ID in event
-  b: [string, string][]; // Bids to be updated
-  a: [string, string][]; // Asks to be updated
+type ServerMessage = {
+  type: 'orderbook' | 'gasprice';
+  data: any;
+};
+
+type OrderBookData = {
+  symbol: string;
+  bids: [string, string][];
+  asks: [string, string][];
+  timestamp: number;
 };
 
 type OrderBookProps = {
@@ -22,28 +24,58 @@ type OrderBookProps = {
 
 // Boilerplate data for realistic order book simulation
 const getBoilerplateData = (blockchainName: string) => {
-  const basePrice = blockchainName === "Ethereum" ? 3200 : 0.85; // ETH ~$3200, MATIC ~$0.85
-  const spread = blockchainName === "Ethereum" ? 2 : 0.001; // Spread for ETH and MATIC
+  let basePrice: number;
+  let spread: number;
+  
+  switch (blockchainName) {
+    case "Ethereum":
+      basePrice = 3200; // ETH ~$3200
+      spread = 0.5; // Reduced spread for more realistic data
+      break;
+    case "Polygon":
+      basePrice = 0.85; // MATIC ~$0.85
+      spread = 0.0005; // Reduced spread
+      break;
+    case "Arbitrum":
+      basePrice = 1.20; // ARB ~$1.20
+      spread = 0.001; // Reduced spread
+      break;
+    default:
+      basePrice = 3200;
+      spread = 0.5;
+  }
   
   const generateOrders = (isAsk: boolean, count: number) => {
     const orders: Order[] = [];
     for (let i = 0; i < count; i++) {
-      const priceOffset = (i + 1) * (spread / 10);
+      const priceOffset = (i + 1) * (spread / 20); // Reduced variation
       const price = isAsk ? basePrice + priceOffset : basePrice - priceOffset;
-      const amount = Math.random() * (blockchainName === "Ethereum" ? 50 : 100000) + 
-                    (blockchainName === "Ethereum" ? 10 : 10000);
+      
+      let amount: number;
+      if (blockchainName === "Ethereum") {
+        amount = Math.random() * 20 + 15; // 15-35 ETH (more realistic)
+      } else if (blockchainName === "Polygon") {
+        amount = Math.random() * 50000 + 50000; // 50k-100k MATIC
+      } else if (blockchainName === "Arbitrum") {
+        amount = Math.random() * 20000 + 20000; // 20k-40k ARB
+      } else {
+        amount = Math.random() * 20 + 15;
+      }
+      
+      const decimalPlaces = blockchainName === "Ethereum" ? 2 : 4;
       orders.push({
-        price: parseFloat(price.toFixed(blockchainName === "Ethereum" ? 2 : 4)),
+        price: parseFloat(price.toFixed(decimalPlaces)),
         amount: parseFloat(amount.toFixed(2))
       });
     }
     return orders;
   };
 
+  const decimalPlaces = blockchainName === "Ethereum" ? 2 : 4;
   return {
     asks: generateOrders(true, 10),
     bids: generateOrders(false, 10),
-    lastPrice: parseFloat(basePrice.toFixed(blockchainName === "Ethereum" ? 2 : 4))
+    lastPrice: parseFloat(basePrice.toFixed(decimalPlaces))
   };
 };
 
@@ -51,82 +83,206 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
   const [bids, setBids] = useState<Map<number, number>>(new Map());
   const [asks, setAsks] = useState<Map<number, number>>(new Map());
   const [lastPrice, setLastPrice] = useState<number | null>(null);
-  const [isUsingBoilerplate, setIsUsingBoilerplate] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
   const [boilerplateData] = useState(() => getBoilerplateData(blockchainName));
+  
+  // Use refs to track state that shouldn't cause re-renders
+  const hasReceivedRealDataRef = useRef(false);
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const symbol = blockchainName === "Ethereum" ? "ethusdt" : "maticusdt";
-    // Binance depth stream uses @depth which is a partial book update. For a full book, we'd need @depth@100ms or similar.
-    // However, the standard @depth stream sends incremental updates which we need to process.
-    const wsUrl = `wss://stream.binance.com:9443/ws/${symbol}@depth`;
+    let symbol: string;
+    switch (blockchainName) {
+      case "Ethereum":
+        symbol = "ethusdt";
+        break;
+      case "Polygon":
+        symbol = "maticusdt";
+        break;
+      case "Arbitrum":
+        symbol = "arbusdt";
+        break;
+      default:
+        symbol = "ethusdt";
+    }
+    
+    // Try local server first, then fallback to direct Binance connection
+    const localWsUrl = "ws://localhost:4000";
+    const binanceWsUrl = `wss://stream.binance.com:9443/ws/${symbol}@depth`;
+    
+    let useLocalServer = true;
+    let connectionTimeout: NodeJS.Timeout;
 
-    const ws = new WebSocket(wsUrl);
+    // Close existing connection if any
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
 
-    ws.onopen = () => {
-      console.log(`WebSocket connected for ${symbol}`);
-      // No explicit subscription message needed for @depth stream, it starts sending data automatically
-    };
-
-    ws.onmessage = (event) => {
+    const connectToServer = () => {
+      const wsUrl = useLocalServer ? localWsUrl : binanceWsUrl;
+      
       try {
-        const data: BinanceDepthStreamMessage = JSON.parse(event.data);
+        const ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
 
-        // Switch from boilerplate to real data when we receive the first message
-        if (isUsingBoilerplate) {
-          setIsUsingBoilerplate(false);
-        }
+        // Set connection timeout
+        connectionTimeout = setTimeout(() => {
+          if (ws.readyState === WebSocket.CONNECTING) {
+            console.log("Connection timeout, trying fallback...");
+            ws.close();
+          }
+        }, 5000); // 5 second timeout
 
-        setBids((prevBids) => {
-          const newBids = new Map(prevBids);
-          data.b.forEach(([priceStr, amountStr]) => {
-            const price = parseFloat(priceStr);
-            const amount = parseFloat(amountStr);
-            if (amount === 0) {
-              newBids.delete(price);
+        ws.onopen = () => {
+          clearTimeout(connectionTimeout);
+          if (useLocalServer) {
+            console.log(`Connected to local server for ${symbol}`);
+            setIsConnected(true);
+            
+            // Subscribe to order book updates for this symbol
+            ws.send(JSON.stringify({
+              type: 'subscribe_orderbook',
+              symbol: symbol
+            }));
+          } else {
+            console.log(`Connected directly to Binance for ${symbol}`);
+            setIsConnected(true);
+          }
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            if (useLocalServer) {
+              const message: ServerMessage = JSON.parse(event.data);
+              
+              if (message.type === 'orderbook') {
+                const orderBookData: OrderBookData = message.data;
+                
+                // Only process data for our symbol
+                if (orderBookData.symbol === symbol) {
+                  // Mark that we've received real data
+                  hasReceivedRealDataRef.current = true;
+                  console.log(`Received real order book data for ${symbol}`);
+
+                  // Update bids
+                  const newBids = new Map<number, number>();
+                  orderBookData.bids.forEach(([priceStr, amountStr]) => {
+                    const price = parseFloat(priceStr);
+                    const amount = parseFloat(amountStr);
+                    newBids.set(price, amount);
+                  });
+                  setBids(newBids);
+
+                  // Update asks
+                  const newAsks = new Map<number, number>();
+                  orderBookData.asks.forEach(([priceStr, amountStr]) => {
+                    const price = parseFloat(priceStr);
+                    const amount = parseFloat(amountStr);
+                    newAsks.set(price, amount);
+                  });
+                  setAsks(newAsks);
+                }
+              }
             } else {
-              newBids.set(price, amount);
-            }
-          });
-          return newBids;
-        });
+              // Direct Binance connection (fallback)
+              const data = JSON.parse(event.data);
+              
+              // Mark that we've received real data
+              hasReceivedRealDataRef.current = true;
+              console.log(`Received real data from Binance for ${symbol}`);
 
-        setAsks((prevAsks) => {
-          const newAsks = new Map(prevAsks);
-          data.a.forEach(([priceStr, amountStr]) => {
-            const price = parseFloat(priceStr);
-            const amount = parseFloat(amountStr);
-            if (amount === 0) {
-              newAsks.delete(price);
-            } else {
-              newAsks.set(price, amount);
+              setBids((prevBids) => {
+                const newBids = new Map(prevBids);
+                data.b.forEach(([priceStr, amountStr]: [string, string]) => {
+                  const price = parseFloat(priceStr);
+                  const amount = parseFloat(amountStr);
+                  if (amount === 0) {
+                    newBids.delete(price);
+                  } else {
+                    newBids.set(price, amount);
+                  }
+                });
+                return newBids;
+              });
+
+              setAsks((prevAsks) => {
+                const newAsks = new Map(prevAsks);
+                data.a.forEach(([priceStr, amountStr]: [string, string]) => {
+                  const price = parseFloat(priceStr);
+                  const amount = parseFloat(amountStr);
+                  if (amount === 0) {
+                    newAsks.delete(price);
+                  } else {
+                    newAsks.set(price, amount);
+                  }
+                });
+                return newAsks;
+              });
             }
-          });
-          return newAsks;
-        });
+          } catch (error) {
+            console.error("Error parsing server message:", error);
+          }
+        };
+
+        ws.onerror = (error) => {
+          clearTimeout(connectionTimeout);
+          console.error("WebSocket error:", error);
+          setIsConnected(false);
+          
+          if (useLocalServer) {
+            console.log("Local server not available, trying direct Binance connection...");
+            useLocalServer = false;
+            setTimeout(() => {
+              connectToServer();
+            }, 1000);
+          }
+        };
+
+        ws.onclose = (event) => {
+          clearTimeout(connectionTimeout);
+          console.log(`WebSocket disconnected for ${symbol}`, event.code, event.reason);
+          setIsConnected(false);
+          
+          // If local server connection was closed unexpectedly, try Binance
+          if (useLocalServer && event.code !== 1000) {
+            console.log("Local server connection closed, trying direct Binance connection...");
+            useLocalServer = false;
+            setTimeout(() => {
+              connectToServer();
+            }, 1000);
+          }
+        };
       } catch (error) {
-        console.error("Error parsing WebSocket message or updating order book:", error);
-        console.error("Raw WebSocket message:", event.data);
+        console.error("Error creating WebSocket connection:", error);
+        setIsConnected(false);
+        
+        if (useLocalServer) {
+          console.log("Failed to create local server connection, trying direct Binance connection...");
+          useLocalServer = false;
+          setTimeout(() => {
+            connectToServer();
+          }, 1000);
+        }
       }
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    ws.onclose = () => {
-      console.log(`WebSocket disconnected for ${symbol}`);
-      // If connection is lost, revert to boilerplate data
-      setIsUsingBoilerplate(true);
-    };
+    // Add a small delay to ensure server is ready
+    setTimeout(() => {
+      connectToServer();
+    }, 100);
 
     return () => {
-      ws.close();
+      clearTimeout(connectionTimeout);
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
-  }, [blockchainName, isUsingBoilerplate]);
+  }, [blockchainName]); // Only depend on blockchainName
 
   useEffect(() => {
-    if (isUsingBoilerplate) {
-      // Use boilerplate data
+    if (!hasReceivedRealDataRef.current) {
+      // Use boilerplate data only if we haven't received real data
       setLastPrice(boilerplateData.lastPrice);
     } else {
       // Calculate last price from the updated bids and asks
@@ -137,20 +293,20 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         const midPrice = (sortedBids[0][0] + sortedAsks[0][0]) / 2;
         setLastPrice(parseFloat(midPrice.toFixed(blockchainName === "Ethereum" ? 2 : 4)));
       } else {
-        setLastPrice(null); // No data yet
+        setLastPrice(null);
       }
     }
-  }, [bids, asks, isUsingBoilerplate, boilerplateData.lastPrice, blockchainName]);
+  }, [bids, asks, boilerplateData.lastPrice, blockchainName]);
 
   // Determine which data to display
-  const displayBids = isUsingBoilerplate 
+  const displayBids = !hasReceivedRealDataRef.current 
     ? boilerplateData.bids
     : Array.from(bids.entries())
         .map(([price, amount]) => ({ price, amount }))
         .sort((a, b) => b.price - a.price)
         .slice(0, 10);
 
-  const displayAsks = isUsingBoilerplate
+  const displayAsks = !hasReceivedRealDataRef.current
     ? boilerplateData.asks
     : Array.from(asks.entries())
         .map(([price, amount]) => ({ price, amount }))
@@ -165,7 +321,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         <span className="text-xl font-medium text-cyan-400">
           ${lastPrice !== null ? lastPrice : "Loading..."}
         </span>
-
+        {!hasReceivedRealDataRef.current && (
+          <div className="text-xs text-yellow-400 mt-1">
+            {isConnected ? "live" : "loading"}
+          </div>
+        )}
+        
       </div>
 
       <div className="grid grid-cols-2 mt-3 gap-4">
