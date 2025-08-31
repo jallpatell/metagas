@@ -49,9 +49,13 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full sm:w-auto">
                   <div className="rounded-lg p-2 bg-blue-400/20 min-w-40">
-                    <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">Gas</h2>
-                    <h2 className="font-sans font-bold text-sm sm:text-base text-blue-400 truncate">
-                      {gasPrice || "Loading..."}
+                  <div className="flex ">
+                  <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">Gas</h2>
+                  <div className="w-1.5 h-1.5 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
+                  </div>
+                    
+                    <h2 className="font-sans  font-bold text-sm sm:text-base text-blue-400 truncate">
+                      {gasPrice || "Loading..."} 
                     </h2>
                   </div>
                   <div className="rounded-lg p-2 bg-green-300/20 min-w-40">
