@@ -6,66 +6,125 @@ type Order = {
   amount: number;
 };
 
-// Utility to generate random number within range
-const randomInRange = (min: number, max: number, decimals = 2) =>
-  parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
-
-const generateOrders = (
-  type: "bids" | "asks",
-  count: number,
-  basePrice: number
-): Order[] => {
-  const orders: Order[] = [];
-  for (let i = 0; i < count; i++) {
-    const price =
-      type === "bids"
-        ? basePrice - i * randomInRange(0.5, 1.5)
-        : basePrice + i * randomInRange(0.5, 1.5);
-    orders.push({
-      price: parseFloat(price.toFixed(2)),
-      amount: randomInRange(0.1, 5, 3),
-    });
-  }
-  return orders;
+type BinanceDepthStreamMessage = {
+  e: string; // Event type
+  E: number; // Event time
+  s: string; // Symbol
+  U: number; // First update ID in event
+  u: number; // Final update ID in event
+  b: [string, string][]; // Bids to be updated
+  a: [string, string][]; // Asks to be updated
 };
 
-const OrderBook: React.FC = () => {
-  const [bids, setBids] = useState<Order[]>([]);
-  const [asks, setAsks] = useState<Order[]>([]);
-  const [lastPrice, setLastPrice] = useState(4200);
+type OrderBookProps = {
+  blockchainName: string;
+};
 
-  // Initialize and update order book whenever lastPrice changes
+const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
+  const [bids, setBids] = useState<Map<number, number>>(new Map());
+  const [asks, setAsks] = useState<Map<number, number>>(new Map());
+  const [lastPrice, setLastPrice] = useState<number | null>(null);
+
   useEffect(() => {
-    setBids(generateOrders("bids", 10, lastPrice));
-    setAsks(generateOrders("asks", 10, lastPrice));
-  }, [lastPrice]); // ✅ Added lastPrice as dependency
+    let ws: WebSocket;
+    const symbol = blockchainName === "Ethereum" ? "ethusdt" : "maticusdt";
+    // Binance depth stream uses @depth which is a partial book update. For a full book, we'd need @depth@100ms or similar.
+    // However, the standard @depth stream sends incremental updates which we need to process.
+    const wsUrl = `wss://stream.binance.com:9443/ws/${symbol}@depth`;
 
-  // Simulate price updates every second
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log(`WebSocket connected for ${symbol}`);
+      // No explicit subscription message needed for @depth stream, it starts sending data automatically
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data: BinanceDepthStreamMessage = JSON.parse(event.data);
+
+        setBids((prevBids) => {
+          const newBids = new Map(prevBids);
+          data.b.forEach(([priceStr, amountStr]) => {
+            const price = parseFloat(priceStr);
+            const amount = parseFloat(amountStr);
+            if (amount === 0) {
+              newBids.delete(price);
+            } else {
+              newBids.set(price, amount);
+            }
+          });
+          return newBids;
+        });
+
+        setAsks((prevAsks) => {
+          const newAsks = new Map(prevAsks);
+          data.a.forEach(([priceStr, amountStr]) => {
+            const price = parseFloat(priceStr);
+            const amount = parseFloat(amountStr);
+            if (amount === 0) {
+              newAsks.delete(price);
+            } else {
+              newAsks.set(price, amount);
+            }
+          });
+          return newAsks;
+        });
+      } catch (error) {
+        console.error("Error parsing WebSocket message or updating order book:", error);
+        console.error("Raw WebSocket message:", event.data);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log(`WebSocket disconnected for ${symbol}`);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [blockchainName]);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLastPrice((prevPrice) => {
-        const newPrice = prevPrice + randomInRange(-20, 20);
-        return parseFloat(newPrice.toFixed(2));
-      });
-    }, 500);
+    // Calculate last price from the updated bids and asks
+    const sortedBids = Array.from(bids.entries()).sort((a, b) => b[0] - a[0]);
+    const sortedAsks = Array.from(asks.entries()).sort((a, b) => a[0] - b[0]);
 
-    return () => clearInterval(interval);
-  }, []);
+    if (sortedBids.length > 0 && sortedAsks.length > 0) {
+      const midPrice = (sortedBids[0][0] + sortedAsks[0][0]) / 2;
+      setLastPrice(parseFloat(midPrice.toFixed(2)));
+    } else {
+      setLastPrice(null); // No data yet
+    }
+  }, [bids, asks]); // Recalculate when bids or asks change
+
+  const displayBids = Array.from(bids.entries())
+    .map(([price, amount]) => ({ price, amount }))
+    .sort((a, b) => b.price - a.price)
+    .slice(0, 10);
+  const displayAsks = Array.from(asks.entries())
+    .map(([price, amount]) => ({ price, amount }))
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 10);
 
   return (
-    <div className="p-4 bg-black text-white rounded-xl shadow-lg w-110 h-130 -mt-6 max-w-lg mx-auto font-mono">
+    <div className="p-4 bg-black text-white rounded-xl shadow-lg w-95 h-110 -mt-6 max-w-lg mx-auto font-mono">
       {/* Last Price */}
-      <div className="text-center mb-4">
+      <div className="text-center bg-cyan-400/20 p-2 rounded-lg mb-4">
         <span className="text-gray-400 font-extralight">Last Price: </span>
-        <span className="text-2xl font-medium">${lastPrice}</span>
+        <span className="text-xl font-medium text-cyan-400">${lastPrice !== null ? lastPrice : "Loading..."}</span>
       </div>
 
-      <div className="grid grid-cols-2 mt-10 gap-4">
+      <div className="grid grid-cols-2 mt-3 gap-4">
         {/* Asks */}
         <div>
           <h3 className="text-red-400 font-semibold mb-2">Asks</h3>
           <div className="space-y-1">
-            {asks.map((ask, idx) => (
+            {displayAsks.map((ask, idx) => (
               <div
                 key={idx}
                 className="flex justify-between text-sm bg-red-900/30 p-1 rounded"
@@ -81,7 +140,7 @@ const OrderBook: React.FC = () => {
         <div>
           <h3 className="text-green-400 font-semibold mb-2">Bids</h3>
           <div className="space-y-1">
-            {bids.map((bid, idx) => (
+            {displayBids.map((bid, idx) => (
               <div
                 key={idx}
                 className="flex justify-between text-sm bg-green-900/30 p-1 rounded"

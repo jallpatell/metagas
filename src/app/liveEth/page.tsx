@@ -3,36 +3,19 @@
 import MainPage from "@/components/MainPage";
 import { useState, useEffect } from "react";
 import ethlogo from "../../../public/assets/ethlogo.svg";
+import { useGasPriceFeed } from "@/utils/websocket";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
 export default function GasPage() {
-  const [gasPrice, setGasPrice] = useState<string | null>(null);
+  const gasPrices = useGasPriceFeed();
 
-  useEffect(() => {
-    const socket = new window.WebSocket("ws://localhost:4001");
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data?.gasPrice) {
-          setGasPrice(data.gasPrice);
-        }
-      } catch (err) {
-        console.error("Invalid WebSocket message:", err);
-      }
-    };
-
-    socket.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    return () => {
-      socket.close();
-    };
-  }, []);
+  if (!gasPrices) {
+    return <LoadingSkeleton />;
+  }
 
   return (
     <MainPage
-      gasPrice={gasPrice}
+      gasPrice={gasPrices.ethereum}
       blockchainName="Ethereum"
       imageSource={ethlogo}
     />

@@ -78,7 +78,7 @@ export default function LivePriceChart({ gasPrice }: GasChartProps) {
 
   return (
     <div className="p-4 w-full rounded-4xl h-[220px] scale-100 h-40 sm:h-[400px] lg:h-[500px]">
-      <div ref={containerRef} className="w-full h-full mt-7 rounded-xl" />
+      <div ref={containerRef} className="w-full h-100 rounded-xl" />
     </div>
   );
 }

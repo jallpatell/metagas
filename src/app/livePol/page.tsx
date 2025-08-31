@@ -1,24 +1,22 @@
-"use client"
-import GasChart from "@/components/MainPage"
-import { useState, useEffect } from 'react'
+"use client";
+
+import MainPage from "@/components/MainPage";
+import polygonlogo from "../../../public/assets/polygon-matic-logo.svg"; // Assuming this exists
+import { useGasPriceFeed } from "@/utils/websocket";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
 export default function GasPage() {
-    const [gasPrice, setGasPrice] = useState<string | null>(null);
+  const gasPrices = useGasPriceFeed();
 
-    useEffect(() => {
-    const socket = new WebSocket('ws://localhost:4002');
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.gasPrice) {
-        setGasPrice(data.gasPrice);
-      }
-    };
-    return () => socket.close();
-  }, []);
-    
-    return (
-        <div>
-          <GasChart gasPrice={ gasPrice } blockchainName="Polygon" imageSource={"assets/polygon-matic-logo.svg"}/>
-        </div>
-    )
+  if (!gasPrices) {
+    return <LoadingSkeleton />;
+  }
+
+  return (
+    <MainPage
+      gasPrice={gasPrices.polygon}
+      blockchainName="Polygon"
+      imageSource={polygonlogo}
+    />
+  );
 }
