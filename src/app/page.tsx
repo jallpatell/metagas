@@ -139,7 +139,7 @@ const LandingPage = () => {
         
       </div>
       </div>
-      <div mt-60>
+      <div>
         <CryptoList />
       </div>
       <div id='aboutMe'>
