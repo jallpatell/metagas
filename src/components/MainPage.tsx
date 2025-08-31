@@ -7,6 +7,7 @@ import OrderBook from "./OrderBook";
 import GlassCard from "./GlassCard";
 import Footer from "./Footer";
 import CryptoList from "./CryptoList";
+import BlockchainDetails from "./BlockchainDetails";
 
 type StockTradingInterfaceProps = {
   gasPrice: string | null;
@@ -47,21 +48,21 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({
                 </div>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full sm:w-auto">
-                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-0">
+                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-40">
                     <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">Gas</h2>
                     <h2 className="font-sans font-bold text-sm sm:text-base text-blue-400 truncate">
                       {gasPrice || "Loading..."}
                     </h2>
                   </div>
-                  <div className="rounded-lg p-2 bg-green-300/20 min-w-0">
+                  <div className="rounded-lg p-2 bg-green-300/20 min-w-40">
                     <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">24H High</h2>
                     <h2 className="font-sans font-bold text-sm sm:text-base text-green-400 truncate">$4384.74</h2>
                   </div>
-                  <div className="rounded-lg p-2 bg-red-400/20 min-w-0">
+                  <div className="rounded-lg p-2 bg-red-400/20 min-w-40">
                     <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">24H Low</h2>
                     <h2 className="font-sans font-bold text-sm sm:text-base text-red-400 truncate">$4206.20</h2>
                   </div>
-                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-0">
+                  <div className="rounded-lg p-2 bg-blue-400/20 min-w-40">
                     <h2 className="text-xs sm:text-sm font-light font-mono text-gray-500 truncate">{blockchainName}</h2>
                     <h2 className="font-sans font-bold text-sm sm:text-base text-blue-400 truncate">$4290.20</h2>
                   </div>
@@ -72,7 +73,7 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({
             {/* Chart Container - Fixed dimensions to prevent overflow */}
             <div className="w-full bg-black rounded-xl p-4">
               <div className="w-full h-72 sm:h-80 md:h-96 lg:h-[420px]">
-                <GasChartEth gasPrice={gasPrice} />
+                <GasChartEth gasPrice={gasPrice} blockchainName={blockchainName} />
               </div>
             </div>
           </div>
@@ -84,6 +85,7 @@ const StockTradingInterface: React.FC<StockTradingInterfaceProps> = ({
           </div>
             {/* Chain Data */}
           <div className="bg-black h-30 mt-2 lg:w-95 rounded-xl">
+            <BlockchainDetails blockchainName={blockchainName} />
           </div>
           </div>
           
