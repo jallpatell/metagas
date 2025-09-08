@@ -9,7 +9,8 @@ import LoadingSkeleton from "@/components/LoadingSkeleton";
 export default function GasPage() {
   const gasPrices = useGasPriceFeed();
 
-  if (!gasPrices) {
+  // Only show loading if there is truly no data (not even cached)
+  if (!gasPrices || !gasPrices.ethereum) {
     return <LoadingSkeleton />;
   }
 
