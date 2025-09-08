@@ -1,4 +1,4 @@
-# MetaGas - Real-Time Cross-Chain Gas Tracker
+# MetaGas [ Real-Time Cross-Chain Gas Tracker ]
 
 A modern Web3 application for tracking gas prices across Ethereum, Polygon, and Arbitrum networks in real-time.
 
