@@ -50,7 +50,7 @@ const LandingPage = () => {
                          <div className=' -ml-6 -mt-6 flex p-1'>
                            <Image src="/assets/new-tab.png" height={25} width={25} alt='new_tab'/>
                          </div>
-                         <div className="text-2xl font-bold font-mono ">Ethereum (Layer1)</div>
+                         <div className="text-2xl font-bold font-mono ">Ethereum (Layer 1)</div>
                          <div className="text-shadow-md ml-11 mt-3 flex text-gray-300">
                            Live Gas Price <div className="w-2 h-2 ml-2 mt-2 bg-green-400 rounded-full animate-pulse"></div>
                          </div>
