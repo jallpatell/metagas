@@ -13,6 +13,17 @@ type ChartDataPoint = {
   value: number;
 };
 
+type BackendHistoryPoint = {
+  time: number; // seconds
+  arbitrum: number;
+  ethereum: number;
+  polygon: number;
+};
+
+type BackendHistoryResponse = {
+  history: BackendHistoryPoint[];
+};
+
 export default function LivePriceChart({ gasPrice, blockchainName = 'default' }: GasChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const seriesRef = useRef<ISeriesApi<'Area'> | null>(null);
@@ -39,6 +50,52 @@ export default function LivePriceChart({ gasPrice, blockchainName = 'default' }:
     } catch (error) {
       console.error('Error loading chart data:', error);
     }
+    return [];
+  };
+
+  // Load history from backend
+  const loadHistoryFromBackend = async (): Promise<ChartDataPoint[]> => {
+    const urls = [
+      'http://localhost:4000/gas/history?minutes=12',
+      'https://metagas.onrender.com/gas/history?minutes=12'
+    ];
+
+    for (const url of urls) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) continue;
+        
+        const data: BackendHistoryResponse = await response.json();
+        
+        // Map blockchain name to backend field
+        let blockchainField: keyof BackendHistoryPoint;
+        switch (blockchainNameRef.current.toLowerCase()) {
+          case 'ethereum':
+            blockchainField = 'ethereum';
+            break;
+          case 'polygon':
+            blockchainField = 'polygon';
+            break;
+          case 'arbitrum':
+            blockchainField = 'arbitrum';
+            break;
+          default:
+            blockchainField = 'ethereum';
+        }
+        
+        const chartData: ChartDataPoint[] = data.history.map(point => ({
+          time: point.time,
+          value: point[blockchainField] || 0
+        }));
+        
+        console.log(`Loaded ${chartData.length} history points from backend for ${blockchainNameRef.current}`);
+        return chartData;
+      } catch (error) {
+        console.error(`Failed to load from ${url}:`, error);
+      }
+    }
+    
+    console.warn('Could not load history from any backend, using localStorage fallback');
     return [];
   };
 
@@ -107,33 +164,43 @@ export default function LivePriceChart({ gasPrice, blockchainName = 'default' }:
     seriesRef.current = areaSeries;
     chartRef.current = chart;
 
-    // Load existing data or create initial data
-    let chartData = loadChartData();
+    // Load existing data (try backend first, then localStorage)
+    let chartData: ChartDataPoint[] = [];
     
-    if (chartData.length === 0) {
-      // Create initial data if no stored data exists
-      const now = Math.floor(Date.now() / 1000);
-      chartData = Array.from({ length: 900 }, (_, i) => {
-        const t = now - (900 - i);
-        const v = Math.random() * (0.8 - 0.6) + 0.6;
-        return { time: t, value: parseFloat(v.toFixed(9)) };
-      });
-      saveChartData(chartData);
-    }
+    const initializeChart = async () => {
+      // Try to load from backend first
+      chartData = await loadHistoryFromBackend();
+      
+      // If backend fails, try localStorage
+      if (chartData.length === 0) {
+        chartData = loadChartData();
+      }
+      
+      // Only create fake data if both backend and localStorage are empty (shouldn't happen in production)
+      if (chartData.length === 0) {
+        console.warn('No data available from backend or cache, showing empty chart until real data arrives');
+        chartData = [];
+      }
+      
+      // Sort and deduplicate data to ensure ascending order by time
+      const sortedData = chartData
+        .sort((a, b) => a.time - b.time)
+        .filter((point, index, array) => {
+          // Remove duplicates by keeping only the first occurrence of each timestamp
+          return index === 0 || point.time !== array[index - 1].time;
+        });
+      
+      // Set the data on the chart
+      if (sortedData.length > 0) {
+        areaSeries.setData(sortedData.map(point => ({
+          time: point.time as Time,
+          value: point.value
+        })));
+      }
+    };
+    
+    initializeChart();
 
-    // Sort and deduplicate data to ensure ascending order by time
-    const sortedData = chartData
-      .sort((a, b) => a.time - b.time)
-      .filter((point, index, array) => {
-        // Remove duplicates by keeping only the first occurrence of each timestamp
-        return index === 0 || point.time !== array[index - 1].time;
-      });
-
-    // Set the data on the chart
-    areaSeries.setData(sortedData.map(point => ({
-      time: point.time as Time,
-      value: point.value
-    })));
 
     const handleResize = () => {
       chart.applyOptions({ width: containerRef.current?.clientWidth || 0 });

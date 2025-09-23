@@ -53,6 +53,7 @@ type ClientMessage = {
 // Config
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 const POLL_INTERVAL = 1000;
+const HISTORY_WINDOW_MS = (process.env.GAS_HISTORY_MINUTES ? parseInt(process.env.GAS_HISTORY_MINUTES, 10) : 12) * 60 * 1000; // default 12 minutes
 
 const ARB_URL = process.env.ARB_NODE_URL;
 const ETH_URL =
@@ -69,10 +70,49 @@ if (!ARB_URL || !POL_URL) {
 const orderBookDataMap = new Map<string, OrderBookData>();
 const orderBookConnections = new Map<string, Set<WebSocket>>();
 
+// Server-side gas price history (rolling window)
+type GasHistoryPoint = {
+  time: number; // seconds since epoch
+  arbitrum: number;
+  ethereum: number;
+  polygon: number;
+};
+const gasHistory: GasHistoryPoint[] = [];
+
 // Express setup
 const app = express();
+
+// Add CORS middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 app.get("/", (_, res) => {
   res.send("WebSocket server is running 🚀");
+});
+
+// Gas history endpoint (returns last N minutes, default to configured window)
+app.get("/gas/history", (req, res) => {
+  const minutesParam = parseInt((req.query.minutes as string) || "", 10);
+  const windowMs = (!isNaN(minutesParam) && minutesParam > 0 ? minutesParam : (HISTORY_WINDOW_MS / (60 * 1000))) * 60 * 1000;
+  const cutoffSec = Math.floor((Date.now() - windowMs) / 1000);
+  const historySlice = gasHistory.filter(p => p.time >= cutoffSec);
+  res.json({ history: historySlice });
+});
+
+// Current orderbook snapshot endpoint
+app.get("/orderbook/:symbol", (req, res) => {
+  const symbol = (req.params.symbol || "").toLowerCase();
+  const data = orderBookDataMap.get(symbol);
+  if (!data) return res.status(404).json({ error: "No data for symbol" });
+  res.json(data);
 });
 
 const server = createServer(app);
@@ -172,6 +212,22 @@ async function fetchGasPrice(chain: string, url: string): Promise<string> {
 }
 
 // Get all gas prices
+function appendGasHistoryPoint(data: GasPriceData) {
+  // push and prune
+  const point: GasHistoryPoint = {
+    time: Math.floor(data.timestamp / 1000),
+    arbitrum: parseFloat(data.arbitrum) || 0,
+    ethereum: parseFloat(data.ethereum) || 0,
+    polygon: parseFloat(data.polygon) || 0,
+  };
+  gasHistory.push(point);
+  const cutoff = Date.now() - HISTORY_WINDOW_MS;
+  // prune older than cutoff
+  while (gasHistory.length && gasHistory[0].time * 1000 < cutoff) {
+    gasHistory.shift();
+  }
+}
+
 async function getGasPrices(): Promise<GasPriceData> {
   try {
     const [arbitrum, ethereum, polygon] = await Promise.all([
@@ -246,6 +302,9 @@ function updateOrderBook(symbol: string, bids: [string, string][], asks: [string
 async function pollGasPrices() {
   try {
     const gasPrices = await getGasPrices();
+    // append to server-side rolling history regardless of clients
+    appendGasHistoryPoint(gasPrices);
+    // broadcast to any connected clients
     broadcastGasPrices(gasPrices);
   } catch {}
 }

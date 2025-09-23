@@ -22,69 +22,12 @@ type OrderBookProps = {
   blockchainName: string;
 };
 
-// Boilerplate data for realistic order book simulation
-const getBoilerplateData = (blockchainName: string) => {
-  let basePrice: number;
-  let spread: number;
-  
-  switch (blockchainName) {
-    case "Ethereum":
-      basePrice = 3200; // ETH ~$3200
-      spread = 0.5; // Reduced spread for more realistic data
-      break;
-    case "Polygon":
-      basePrice = 0.85; // MATIC ~$0.85
-      spread = 0.0005; // Reduced spread
-      break;
-    case "Arbitrum":
-      basePrice = 1.20; // ARB ~$1.20
-      spread = 0.001; // Reduced spread
-      break;
-    default:
-      basePrice = 3200;
-      spread = 0.5;
-  }
-  
-  const generateOrders = (isAsk: boolean, count: number) => {
-    const orders: Order[] = [];
-    for (let i = 0; i < count; i++) {
-      const priceOffset = (i + 1) * (spread / 20); // Reduced variation
-      const price = isAsk ? basePrice + priceOffset : basePrice - priceOffset;
-      
-      let amount: number;
-      if (blockchainName === "Ethereum") {
-        amount = Math.random() * 20 + 15; // 15-35 ETH (more realistic)
-      } else if (blockchainName === "Polygon") {
-        amount = Math.random() * 50000 + 50000; // 50k-100k MATIC
-      } else if (blockchainName === "Arbitrum") {
-        amount = Math.random() * 20000 + 20000; // 20k-40k ARB
-      } else {
-        amount = Math.random() * 20 + 15;
-      }
-      
-      const decimalPlaces = blockchainName === "Ethereum" ? 2 : 4;
-      orders.push({
-        price: parseFloat(price.toFixed(decimalPlaces)),
-        amount: parseFloat(amount.toFixed(2))
-      });
-    }
-    return orders;
-  };
-
-  const decimalPlaces = blockchainName === "Ethereum" ? 2 : 4;
-  return {
-    asks: generateOrders(true, 10),
-    bids: generateOrders(false, 10),
-    lastPrice: parseFloat(basePrice.toFixed(decimalPlaces))
-  };
-};
 
 const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
   const [bids, setBids] = useState<Map<number, number>>(new Map());
   const [asks, setAsks] = useState<Map<number, number>>(new Map());
   const [lastPrice, setLastPrice] = useState<number | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [boilerplateData] = useState(() => getBoilerplateData(blockchainName));
   
   // Use refs to track state that shouldn't cause re-renders
   const hasReceivedRealDataRef = useRef(false);
@@ -281,10 +224,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
   }, [blockchainName]); // Only depend on blockchainName
 
   useEffect(() => {
-    if (!hasReceivedRealDataRef.current) {
-      // Use boilerplate data only if we haven't received real data
-      setLastPrice(boilerplateData.lastPrice);
-    } else {
+    if (hasReceivedRealDataRef.current) {
       // Calculate last price from the updated bids and asks
       const sortedBids = Array.from(bids.entries()).sort((a, b) => b[0] - a[0]);
       const sortedAsks = Array.from(asks.entries()).sort((a, b) => a[0] - b[0]);
@@ -296,22 +236,22 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         setLastPrice(null);
       }
     }
-  }, [bids, asks, boilerplateData.lastPrice, blockchainName]);
+  }, [bids, asks, blockchainName]);
 
-  // Determine which data to display
-  const displayBids = !hasReceivedRealDataRef.current 
-    ? boilerplateData.bids
-    : Array.from(bids.entries())
+  // Determine which data to display - only show real data, empty if no data yet
+  const displayBids = hasReceivedRealDataRef.current 
+    ? Array.from(bids.entries())
         .map(([price, amount]) => ({ price, amount }))
         .sort((a, b) => b.price - a.price)
-        .slice(0, 10);
+        .slice(0, 10)
+    : [];
 
-  const displayAsks = !hasReceivedRealDataRef.current
-    ? boilerplateData.asks
-    : Array.from(asks.entries())
+  const displayAsks = hasReceivedRealDataRef.current
+    ? Array.from(asks.entries())
         .map(([price, amount]) => ({ price, amount }))
         .sort((a, b) => a.price - b.price)
-        .slice(0, 10);
+        .slice(0, 10)
+    : [];
 
   return (
     <div className="p-4 bg-black text-white rounded-xl shadow-lg w-95 h-110 -mt-6 max-w-lg mx-auto font-mono">
@@ -319,7 +259,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
       <div className="text-center bg-cyan-400/20 p-2 rounded-lg mb-4">
         <span className="text-gray-400 font-extralight">Last Price: </span>
         <span className="text-xl font-medium text-cyan-400">
-          ${lastPrice !== null ? lastPrice : "Loading..."}
+          {lastPrice !== null ? `$${lastPrice}` : "Loading..."}
         </span>
         
         
@@ -330,15 +270,19 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         <div>
           <h3 className="text-red-400 font-semibold mb-2">Asks</h3>
           <div className="space-y-1">
-            {displayAsks.map((ask, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between text-sm bg-red-900/30 p-1 rounded"
-              >
-                <span className="text-red-400">${ask.price}</span>
-                <span>{ask.amount}</span>
-              </div>
-            ))}
+            {displayAsks.length === 0 ? (
+              <div className="text-sm text-gray-400 p-2 text-center">Loading live data...</div>
+            ) : (
+              displayAsks.map((ask, idx) => (
+                <div
+                  key={idx}
+                  className="flex justify-between text-sm bg-red-900/30 p-1 rounded"
+                >
+                  <span className="text-red-400">${ask.price}</span>
+                  <span>{ask.amount}</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -346,15 +290,19 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         <div>
           <h3 className="text-green-400 font-semibold mb-2">Bids</h3>
           <div className="space-y-1">
-            {displayBids.map((bid, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between text-sm bg-green-900/30 p-1 rounded"
-              >
-                <span className="text-green-400">${bid.price}</span>
-                <span>{bid.amount}</span>
-              </div>
-            ))}
+            {displayBids.length === 0 ? (
+              <div className="text-sm text-gray-400 p-2 text-center">Loading live data...</div>
+            ) : (
+              displayBids.map((bid, idx) => (
+                <div
+                  key={idx}
+                  className="flex justify-between text-sm bg-green-900/30 p-1 rounded"
+                >
+                  <span className="text-green-400">${bid.price}</span>
+                  <span>{bid.amount}</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
