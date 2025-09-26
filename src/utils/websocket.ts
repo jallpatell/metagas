@@ -12,8 +12,9 @@ type ServerMessage = {
   data: any;
 };
 
+// Prefer env-configured remote URL in production; use localhost only during local development
 const LOCAL_WS_URL = "ws://localhost:4000";
-const REMOTE_WS_URL = "wss://metagas.onrender.com/";
+const REMOTE_WS_URL = process.env.NEXT_PUBLIC_WS_URL || "wss://metagas.onrender.com";
 
 function getCachedGasPrices(): GasPriceData | null {
   try {
@@ -38,11 +39,12 @@ export const useGasPriceFeed = () => {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    const wsUrl = retryCount === 0 ? LOCAL_WS_URL : REMOTE_WS_URL;
+    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname.startsWith('127.'));
+    const wsUrl = isLocal ? (retryCount === 0 ? LOCAL_WS_URL : REMOTE_WS_URL) : REMOTE_WS_URL;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
-      console.log(`WebSocket connected to ${retryCount === 0 ? 'local' : 'remote'} server`);
+      console.log(`WebSocket connected to ${isLocal && retryCount === 0 ? 'local' : 'remote'} server`);
       setIsConnected(true);
       setRetryCount(0);
     };
@@ -54,8 +56,8 @@ export const useGasPriceFeed = () => {
           const data: GasPriceData = message.data;
           setGasPrices(data);
           setCachedGasPrices(data);
-        } else if (retryCount > 0) {
-          // If using remote server, handle the old format
+        } else if (!isLocal || retryCount > 0) {
+          // If using remote server (production) and message is raw
           const data: GasPriceData = message as any;
           setGasPrices(data);
           setCachedGasPrices(data);
@@ -66,17 +68,17 @@ export const useGasPriceFeed = () => {
     };
 
     ws.onclose = () => {
-      console.log(`WebSocket disconnected from ${retryCount === 0 ? 'local' : 'remote'} server`);
+      console.log(`WebSocket disconnected from ${isLocal && retryCount === 0 ? 'local' : 'remote'} server`);
       setIsConnected(false);
     };
 
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
-      if (retryCount === 0) {
+      if (isLocal && retryCount === 0) {
         console.log("Local server not available, trying remote server...");
         setRetryCount(1);
       } else {
-        console.log("Both local and remote servers unavailable");
+        console.log("WebSocket server unavailable");
       }
       setIsConnected(false);
     };

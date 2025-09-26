@@ -55,10 +55,18 @@ export default function LivePriceChart({ gasPrice, blockchainName = 'default' }:
 
   // Load history from backend
   const loadHistoryFromBackend = async (): Promise<ChartDataPoint[]> => {
-    const urls = [
-      'http://localhost:4000/gas/history?minutes=12',
-      'https://metagas.onrender.com/gas/history?minutes=12'
-    ];
+    const ENV_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://metagas.onrender.com';
+    const LOCAL_BASE = 'http://localhost:4000';
+    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname.startsWith('127.'));
+
+    const urls = isLocal
+      ? [
+          `${LOCAL_BASE}/gas/history?minutes=12`,
+          `${ENV_BASE}/gas/history?minutes=12`
+        ]
+      : [
+          `${ENV_BASE}/gas/history?minutes=12`
+        ];
 
     for (const url of urls) {
       try {
