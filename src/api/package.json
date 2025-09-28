@@ -5,7 +5,7 @@
     "main": "fetchGas.js",
     "scripts": {
         "build": "tsc",
-        "start": "node src/api/dist/fetchGas.js",
+        "start": "node dist/fetchGas.js",
         "dev": "ts-node fetchGas.ts"
     },
     "keywords": [],
