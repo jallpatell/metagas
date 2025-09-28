@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import express from "express";
+import express, { Request, Response } from "express";
 import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { formatUnits } from "ethers";
@@ -44,7 +44,7 @@ if (!ARB_URL || !POL_URL) {
 
 // Express setup
 const app = express();
-app.get("/", (_, res) => {
+app.get("/", (_: Request, res: Response) => {
   res.send("WebSocket server is running 🚀");
 });
 
