@@ -14,20 +14,20 @@ type BinanceDepthStreamMessage = {
 class OrderBookService {
   private connections: Map<string, WebSocket> = new Map();
   private orderBookData: Map<string, { bids: Map<number, number>; asks: Map<number, number> }> = new Map();
+  private retryIntervals: Map<string, number> = new Map();
+
+  private readonly symbols = ['ethusdt', 'maticusdt', 'arbusdt'];
+  private readonly baseRetryMs = 5000; // 5 seconds initial backoff
+  private readonly maxRetryMs = 60000; // Max 1 minute backoff
 
   constructor() {
     this.initializeConnections();
   }
 
   private initializeConnections() {
-    const symbols = ['ethusdt', 'maticusdt', 'arbusdt'];
-    
-    symbols.forEach(symbol => {
+    this.symbols.forEach((symbol) => {
+      this.orderBookData.set(symbol, { bids: new Map(), asks: new Map() });
       this.connectToBinance(symbol);
-      this.orderBookData.set(symbol, {
-        bids: new Map(),
-        asks: new Map()
-      });
     });
   }
 
@@ -37,6 +37,7 @@ class OrderBookService {
 
     ws.on('open', () => {
       console.log(`📊 Connected to Binance order book for ${symbol}`);
+      this.retryIntervals.set(symbol, this.baseRetryMs); // reset retry interval on successful connection
     });
 
     ws.on('message', (data: WebSocket.Data) => {
@@ -48,18 +49,28 @@ class OrderBookService {
       }
     });
 
+    ws.on('close', () => {
+      console.warn(`WebSocket closed for ${symbol}, reconnecting...`);
+      this.scheduleReconnect(symbol);
+    });
+
     ws.on('error', (error) => {
       console.error(`WebSocket error for ${symbol}:`, error);
     });
 
-    ws.on('close', () => {
-      console.log(`WebSocket closed for ${symbol}, reconnecting...`);
-      setTimeout(() => {
-        this.connectToBinance(symbol);
-      }, 5000);
-    });
-
     this.connections.set(symbol, ws);
+  }
+
+  private scheduleReconnect(symbol: string) {
+    const currentRetry = this.retryIntervals.get(symbol) || this.baseRetryMs;
+    const nextRetry = Math.min(currentRetry * 2, this.maxRetryMs); // exponential backoff
+
+    setTimeout(() => {
+      console.log(`🔄 Reconnecting to Binance for ${symbol}...`);
+      this.connectToBinance(symbol);
+    }, currentRetry);
+
+    this.retryIntervals.set(symbol, nextRetry);
   }
 
   private processOrderBookUpdate(symbol: string, message: BinanceDepthStreamMessage) {
@@ -70,38 +81,29 @@ class OrderBookService {
     message.b.forEach(([priceStr, amountStr]) => {
       const price = parseFloat(priceStr);
       const amount = parseFloat(amountStr);
-      
-      if (amount === 0) {
-        orderBook.bids.delete(price);
-      } else {
-        orderBook.bids.set(price, amount);
-      }
+      if (amount === 0) orderBook.bids.delete(price);
+      else orderBook.bids.set(price, amount);
     });
 
     // Update asks
     message.a.forEach(([priceStr, amountStr]) => {
       const price = parseFloat(priceStr);
       const amount = parseFloat(amountStr);
-      
-      if (amount === 0) {
-        orderBook.asks.delete(price);
-      } else {
-        orderBook.asks.set(price, amount);
-      }
+      if (amount === 0) orderBook.asks.delete(price);
+      else orderBook.asks.set(price, amount);
     });
 
-    // Convert to arrays and send to server
+    // Convert top 10 bids/asks and send to server
     const bidsArray: [string, string][] = Array.from(orderBook.bids.entries())
-      .sort((a, b) => b[0] - a[0]) // Sort bids descending
-      .slice(0, 10) // Take top 10
+      .sort((a, b) => b[0] - a[0])
+      .slice(0, 10)
       .map(([price, amount]) => [price.toString(), amount.toString()]);
 
     const asksArray: [string, string][] = Array.from(orderBook.asks.entries())
-      .sort((a, b) => a[0] - b[0]) // Sort asks ascending
-      .slice(0, 10) // Take top 10
+      .sort((a, b) => a[0] - b[0])
+      .slice(0, 10)
       .map(([price, amount]) => [price.toString(), amount.toString()]);
 
-    // Send to server for distribution to all clients
     updateOrderBook(symbol, bidsArray, asksArray);
   }
 
@@ -128,9 +130,7 @@ class OrderBookService {
   }
 
   public closeAll() {
-    this.connections.forEach((ws, symbol) => {
-      ws.close();
-    });
+    this.connections.forEach((ws) => ws.close());
     this.connections.clear();
   }
 }
