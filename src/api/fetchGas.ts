@@ -1,110 +1,146 @@
-import WebSocket from 'ws';
-import { updateOrderBook } from './fetchGas';
+// src/api/fetchGas.ts
+import dotenv from 'dotenv';
+import express, { Request, Response, NextFunction } from 'express';
+import { createServer } from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
+import { formatUnits } from 'ethers';
+import { initializeOrderBookSymbols, subscribeClientToSymbol, removeClientFromAll, getOrderBookSnapshot, updateOrderBook, OrderBookData } from './orderbookBridge';
+import './orderbookService'; // ensures orderbookService starts
 
-type BinanceDepthStreamMessage = {
-  e: string;
-  E: number;
-  s: string;
-  U: number;
-  u: number;
-  b: [string, string][];
-  a: [string, string][];
-};
+dotenv.config();
 
-class OrderBookService {
-  private connections = new Map<string, WebSocket>();
-  private orderBookData = new Map<string, { bids: Map<number, number>; asks: Map<number, number> }>();
-  private retryIntervals = new Map<string, number>();
+// Types
+type JsonRpcRequest = { jsonrpc: string; method: string; params: string[]; id: number; };
+type JsonRpcResponse = { jsonrpc: string; id: number; result: string; };
 
-  private readonly symbols = ['ethusdt', 'maticusdt', 'arbusdt'];
-  private readonly baseRetryMs = 5000;
-  private readonly maxRetryMs = 60000;
+export type GasPriceData = { arbitrum: string; ethereum: string; polygon: string; timestamp: number; };
 
-  constructor() {
-    this.symbols.forEach((symbol) => {
-      this.orderBookData.set(symbol, { bids: new Map(), asks: new Map() });
-      this.connectToBinance(symbol);
-    });
-  }
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
+const POLL_INTERVAL = 1000;
+const HISTORY_WINDOW_MS = (process.env.GAS_HISTORY_MINUTES ? parseInt(process.env.GAS_HISTORY_MINUTES, 10) : 12) * 60 * 1000;
 
-  private connectToBinance(symbol: string) {
-    const wsUrl = `wss://stream.binance.com:9443/ws/${symbol}@depth`;
-    const ws = new WebSocket(wsUrl);
+const ARB_URL = process.env.ARB_NODE_URL;
+const ETH_URL = process.env.ETH_NODE_URL || 'https://mainnet.infura.io/v3/your-key';
+const POL_URL = process.env.POL_NODE_URL;
 
-    ws.on('open', () => {
-      console.log(`📊 Connected to Binance order book for ${symbol}`);
-      this.retryIntervals.set(symbol, this.baseRetryMs);
-    });
+if (!ARB_URL || !POL_URL) {
+  throw new Error('Missing required environment variables: ARB_NODE_URL, POL_NODE_URL');
+}
 
-    ws.on('message', (data: WebSocket.Data) => {
-      try {
-        const msg: BinanceDepthStreamMessage = JSON.parse(data.toString());
-        this.processOrderBookUpdate(symbol, msg);
-      } catch (err) {
-        console.error(`Error processing order book for ${symbol}:`, err);
+const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
+const clients = new Set<WebSocket>();
+const gasHistory: { time: number; arbitrum: number; ethereum: number; polygon: number }[] = [];
+
+initializeOrderBookSymbols(['ethusdt', 'maticusdt', 'arbusdt']);
+
+// CORS
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') res.sendStatus(200); else next();
+});
+
+app.get('/', (_req: Request, res: Response) => res.send('WebSocket server is running 🚀'));
+
+app.get('/gas/history', (req: Request, res: Response) => {
+  const minutesParam = parseInt((req.query.minutes as string) || '', 10);
+  const windowMs = (!isNaN(minutesParam) && minutesParam > 0 ? minutesParam : HISTORY_WINDOW_MS / (60 * 1000)) * 60 * 1000;
+  const cutoffSec = Math.floor((Date.now() - windowMs) / 1000);
+  const historySlice = gasHistory.filter(p => p.time >= cutoffSec);
+  res.json({ history: historySlice });
+});
+
+app.get('/orderbook/:symbol', (req: Request, res: Response) => {
+  const symbol = (req.params.symbol || '').toLowerCase();
+  const data = getOrderBookSnapshot(symbol);
+  if (!data) return res.status(404).json({ error: 'No data for symbol' });
+  res.json(data);
+});
+
+wss.on('connection', (ws: WebSocket) => {
+  console.log('🔄 New WebSocket client connected');
+  clients.add(ws);
+
+  ws.on('message', (message: string) => {
+    try {
+      const parsed = JSON.parse(message);
+      if (parsed?.type === 'subscribe_orderbook' && typeof parsed.symbol === 'string') {
+        const symbol = parsed.symbol.toLowerCase();
+        subscribeClientToSymbol(symbol, ws);
+        const snapshot = getOrderBookSnapshot(symbol);
+        if (snapshot && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'orderbook', data: snapshot }));
       }
-    });
+    } catch (err) {
+      console.error('Error parsing client message:', err, message);
+    }
+  });
 
-    ws.on('close', () => {
-      console.warn(`WebSocket closed for ${symbol}, reconnecting...`);
-      this.scheduleReconnect(symbol);
-    });
+  ws.on('close', () => {
+    clients.delete(ws);
+    removeClientFromAll(ws);
+  });
 
-    ws.on('error', (err) => console.error(`WebSocket error for ${symbol}:`, err));
-    this.connections.set(symbol, ws);
-  }
+  ws.on('error', (err) => {
+    console.error('WebSocket client error:', err);
+  });
 
-  private scheduleReconnect(symbol: string) {
-    const current = this.retryIntervals.get(symbol) || this.baseRetryMs;
-    const next = Math.min(current * 2, this.maxRetryMs);
+  // send immediate gas price snapshot
+  getGasPrices().then(data => {
+    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'gasprice', data }));
+  });
+});
 
-    setTimeout(() => this.connectToBinance(symbol), current);
-    this.retryIntervals.set(symbol, next);
-  }
-
-  private processOrderBookUpdate(symbol: string, msg: BinanceDepthStreamMessage) {
-    const orderBook = this.orderBookData.get(symbol);
-    if (!orderBook) return;
-
-    msg.b.forEach(([priceStr, amountStr]) => {
-      const price = parseFloat(priceStr);
-      const amount = parseFloat(amountStr);
-      if (amount === 0) orderBook.bids.delete(price);
-      else orderBook.bids.set(price, amount);
-    });
-
-    msg.a.forEach(([priceStr, amountStr]) => {
-      const price = parseFloat(priceStr);
-      const amount = parseFloat(amountStr);
-      if (amount === 0) orderBook.asks.delete(price);
-      else orderBook.asks.set(price, amount);
-    });
-
-    const bids = Array.from(orderBook.bids.entries())
-      .sort((a, b) => b[0] - a[0])
-      .slice(0, 10)
-      .map(([p, a]) => [p.toString(), a.toString()] as [string, string]);
-
-    const asks = Array.from(orderBook.asks.entries())
-      .sort((a, b) => a[0] - b[0])
-      .slice(0, 10)
-      .map(([p, a]) => [p.toString(), a.toString()] as [string, string]);
-
-    updateOrderBook(symbol, bids, asks);
-  }
-
-  public closeAll() {
-    this.connections.forEach((ws) => ws.close());
-    this.connections.clear();
+async function fetchGasPrice(url: string): Promise<string> {
+  const requestBody: JsonRpcRequest = { jsonrpc: '2.0', method: 'eth_gasPrice', params: [], id: 1 };
+  try {
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data: JsonRpcResponse = await resp.json();
+    return parseFloat(formatUnits(data.result, 'gwei')).toFixed(9);
+  } catch {
+    return '0';
   }
 }
 
-const orderBookService = new OrderBookService();
+async function getGasPrices(): Promise<GasPriceData> {
+  try {
+    const [arbitrum, ethereum, polygon] = await Promise.all([fetchGasPrice(ARB_URL!), fetchGasPrice(ETH_URL), fetchGasPrice(POL_URL!)]);
+    return { arbitrum, ethereum, polygon, timestamp: Date.now() };
+  } catch {
+    return { arbitrum: '0', ethereum: '0', polygon: '0', timestamp: Date.now() };
+  }
+}
 
-process.on('SIGINT', () => {
-  console.log('Shutting down order book service...');
-  orderBookService.closeAll();
-  process.exit(0);
+function appendGasHistoryPoint(data: GasPriceData) {
+  gasHistory.push({
+    time: Math.floor(data.timestamp / 1000),
+    arbitrum: parseFloat(data.arbitrum) || 0,
+    ethereum: parseFloat(data.ethereum) || 0,
+    polygon: parseFloat(data.polygon) || 0,
+  });
+  const cutoff = Date.now() - HISTORY_WINDOW_MS;
+  while (gasHistory.length && gasHistory[0].time * 1000 < cutoff) gasHistory.shift();
+}
+
+function broadcastGasPrices(data: GasPriceData) {
+  const payload = JSON.stringify({ type: 'gasprice', data });
+  clients.forEach(c => { if (c.readyState === WebSocket.OPEN) c.send(payload); });
+}
+
+setInterval(async () => {
+  const gp = await getGasPrices();
+  appendGasHistoryPoint(gp);
+  broadcastGasPrices(gp);
+}, POLL_INTERVAL);
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
 });
 
-export default orderBookService;
+process.on('SIGINT', () => {
+  clients.forEach(ws => ws.close());
+  server.close(() => process.exit(0));
+});
