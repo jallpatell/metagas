@@ -49,7 +49,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
         symbol = "ethusdt";
     }
     
-    // Try local server first, then fallback to direct Binance connection
+
     const localWsUrl = "ws://localhost:4000";
     const binanceWsUrl = `wss://stream.binance.com:9443/ws/${symbol}@depth`;
     
@@ -62,7 +62,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ blockchainName }) => {
     }
 
     const connectToServer = () => {
-      const wsUrl = useLocalServer ? localWsUrl : binanceWsUrl;
+      const wsUrl = useLocalServer ? binanceWsUrl : localWsUrl ;
       
       try {
         const ws = new WebSocket(wsUrl);
