@@ -12,9 +12,10 @@ type ServerMessage = {
   data: any;
 };
 
-// Prefer env-configured remote URL in production; use localhost only during local development
+// Default to local server for cloned repos; remote URL is opt-in via env
 const LOCAL_WS_URL = "ws://localhost:4000";
-const REMOTE_WS_URL = process.env.NEXT_PUBLIC_WS_URL || "wss://metagas.onrender.com";
+const REMOTE_WS_URL = process.env.NEXT_PUBLIC_WS_URL;
+const HTTP_FALLBACK_URL = process.env.NEXT_PUBLIC_HTTP_FALLBACK_URL || "https://metagas.onrender.com/gas";
 
 function getCachedGasPrices(): GasPriceData | null {
   try {
@@ -35,58 +36,132 @@ function setCachedGasPrices(data: GasPriceData) {
 export const useGasPriceFeed = () => {
   // Try to get cached prices immediately
   const [gasPrices, setGasPrices] = useState<GasPriceData | null>(() => getCachedGasPrices());
-  const [isConnected, setIsConnected] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
+  const [endpointIndex, setEndpointIndex] = useState(0);
+  const [reconnectSeq, setReconnectSeq] = useState(0);
+  const [httpFallbackActive, setHttpFallbackActive] = useState(false);
 
   useEffect(() => {
-    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname.startsWith('127.'));
-    const wsUrl = isLocal ? (retryCount === 0 ? LOCAL_WS_URL : REMOTE_WS_URL) : REMOTE_WS_URL;
-    const ws = new WebSocket(wsUrl);
+    let pollTimer: ReturnType<typeof setInterval> | undefined;
 
-    ws.onopen = () => {
-      console.log(`WebSocket connected to ${isLocal && retryCount === 0 ? 'local' : 'remote'} server`);
-      setIsConnected(true);
-      setRetryCount(0);
-    };
+    const startHttpPolling = () => {
+      if (httpFallbackActive) return;
+      setHttpFallbackActive(true);
+      console.warn("Starting HTTP fallback polling for gas prices");
 
-    ws.onmessage = (event) => {
-      try {
-        const message: ServerMessage = JSON.parse(event.data);
-        if (message.type === 'gasprice') {
-          const data: GasPriceData = message.data;
-          setGasPrices(data);
-          setCachedGasPrices(data);
-        } else if (!isLocal || retryCount > 0) {
-          // If using remote server (production) and message is raw
-          const data: GasPriceData = message as any;
-          setGasPrices(data);
-          setCachedGasPrices(data);
+      const poll = async () => {
+        try {
+          const response = await fetch(HTTP_FALLBACK_URL, { cache: "no-store" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data: GasPriceData = await response.json();
+
+          if (data?.ethereum && data?.polygon && data?.arbitrum) {
+            setGasPrices(data);
+            setCachedGasPrices(data);
+          } else {
+            console.warn("HTTP fallback returned unexpected payload");
+          }
+        } catch (error) {
+          console.error("HTTP fallback polling failed:", error);
         }
-      } catch (error) {
-        console.error("Error parsing server message:", error);
-      }
+      };
+
+      poll(); // immediate attempt
+      pollTimer = setInterval(poll, 15000); // 15s cadence
     };
 
-    ws.onclose = () => {
-      console.log(`WebSocket disconnected from ${isLocal && retryCount === 0 ? 'local' : 'remote'} server`);
-      setIsConnected(false);
+    const isLocalHost = typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname.startsWith('127.')
+    );
+
+    // When developing locally, always try the local server first and only fall back
+    // to a remote URL if one is explicitly provided. In non-local environments,
+    // require NEXT_PUBLIC_WS_URL to be set; otherwise we still try localhost so the
+    // intent is clear.
+    const endpoints = isLocalHost
+      ? [LOCAL_WS_URL, REMOTE_WS_URL].filter(Boolean)
+      : (REMOTE_WS_URL ? [REMOTE_WS_URL] : [LOCAL_WS_URL]);
+    const url = endpoints[Math.min(endpointIndex, endpoints.length - 1)];
+
+    let ws: WebSocket | null = null;
+    let connectionTimeout: ReturnType<typeof setTimeout> | undefined;
+    let isMounted = true;
+
+    const connect = () => {
+      ws = new WebSocket(url);
+
+      // Bail out to the next endpoint if we can't open within 5 seconds.
+      connectionTimeout = setTimeout(() => {
+        console.warn(`WebSocket to ${url} timed out, trying fallback`);
+        ws?.close();
+        if (endpointIndex < endpoints.length - 1) {
+          setEndpointIndex((prev) => Math.min(prev + 1, endpoints.length - 1));
+        }
+      }, 5000);
+
+      ws.onopen = () => {
+        if (!isMounted) return;
+        clearTimeout(connectionTimeout);
+        console.log(`WebSocket connected to ${url}`);
+      };
+
+      ws.onmessage = (event) => {
+        if (!isMounted) return;
+        try {
+          const message: ServerMessage = JSON.parse(event.data);
+          if (message.type === 'gasprice') {
+            const data: GasPriceData = message.data;
+            setGasPrices(data);
+            setCachedGasPrices(data);
+          } else {
+            // Some deployments send the raw object without a wrapper
+            const data: GasPriceData = message as any;
+            if (data?.ethereum && data?.polygon && data?.arbitrum) {
+              setGasPrices(data);
+              setCachedGasPrices(data);
+            }
+          }
+        } catch (error) {
+          console.error("Error parsing server message:", error);
+        }
+      };
+
+      const handleErrorOrClose = () => {
+        if (!isMounted) return;
+        clearTimeout(connectionTimeout);
+        if (endpointIndex < endpoints.length - 1) {
+          console.log(`Switching WebSocket endpoint (current: ${url})`);
+          setEndpointIndex((prev) => Math.min(prev + 1, endpoints.length - 1));
+        } else {
+          // No other endpoint to try; trigger a reconnect attempt on the same URL
+          setTimeout(() => {
+            setReconnectSeq((prev) => prev + 1);
+          }, 2000);
+          // Also start HTTP polling as a safety net
+          startHttpPolling();
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        handleErrorOrClose();
+      };
+
+      ws.onclose = () => {
+        console.log(`WebSocket disconnected from ${url}`);
+        handleErrorOrClose();
+      };
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      if (isLocal && retryCount === 0) {
-        console.log("Local server not available, trying remote server...");
-        setRetryCount(1);
-      } else {
-        console.log("WebSocket server unavailable");
-      }
-      setIsConnected(false);
-    };
+    connect();
 
     return () => {
-      ws.close();
+      isMounted = false;
+      if (connectionTimeout) clearTimeout(connectionTimeout);
+      ws?.close();
+      if (pollTimer) clearInterval(pollTimer);
     };
-  }, [retryCount]);
+  }, [endpointIndex, reconnectSeq, httpFallbackActive]);
 
   return gasPrices;
 };
