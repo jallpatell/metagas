@@ -15,7 +15,8 @@ type ServerMessage = {
 // Default to local server for cloned repos; remote URL is opt-in via env
 const LOCAL_WS_URL = "ws://localhost:4000";
 const REMOTE_WS_URL = process.env.NEXT_PUBLIC_WS_URL;
-const HTTP_FALLBACK_URL = process.env.NEXT_PUBLIC_HTTP_FALLBACK_URL || "https://metagas.onrender.com/gas";
+// HTTP fallback URL must be explicitly configured; we don't hard-code a path
+const HTTP_FALLBACK_URL = process.env.NEXT_PUBLIC_HTTP_FALLBACK_URL;
 
 function getCachedGasPrices(): GasPriceData | null {
   try {
@@ -45,6 +46,10 @@ export const useGasPriceFeed = () => {
 
     const startHttpPolling = () => {
       if (httpFallbackActive) return;
+      if (!HTTP_FALLBACK_URL) {
+        console.warn("HTTP fallback URL is not configured; skipping HTTP polling");
+        return;
+      }
       setHttpFallbackActive(true);
       console.warn("Starting HTTP fallback polling for gas prices");
 
