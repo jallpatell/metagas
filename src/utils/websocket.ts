@@ -79,10 +79,6 @@ export const useGasPriceFeed = () => {
       window.location.hostname.startsWith('127.')
     );
 
-    // When developing locally, always try the local server first and only fall back
-    // to a remote URL if one is explicitly provided. In non-local environments,
-    // require NEXT_PUBLIC_WS_URL to be set; otherwise we still try localhost so the
-    // intent is clear.
     const endpoints = isLocalHost
       ? [LOCAL_WS_URL, REMOTE_WS_URL].filter(Boolean)
       : (REMOTE_WS_URL ? [REMOTE_WS_URL] : [LOCAL_WS_URL]);
@@ -91,11 +87,16 @@ export const useGasPriceFeed = () => {
     let ws: WebSocket | null = null;
     let connectionTimeout: ReturnType<typeof setTimeout> | undefined;
     let isMounted = true;
+    const AUTH_TOKEN = process.env.NEXT_PUBLIC_WS_TOKEN;
+    let authSent = false;
 
     const connect = () => {
+      if (!url) {
+        console.warn('WebSocket URL is not configured.');
+        return;
+      }
       ws = new WebSocket(url);
-
-      // Bail out to the next endpoint if we can't open within 5 seconds.
+      authSent = false;
       connectionTimeout = setTimeout(() => {
         console.warn(`WebSocket to ${url} timed out, trying fallback`);
         ws?.close();
@@ -108,6 +109,15 @@ export const useGasPriceFeed = () => {
         if (!isMounted) return;
         clearTimeout(connectionTimeout);
         console.log(`WebSocket connected to ${url}`);
+        // --- Authenticate if token is set and not yet sent ---
+        if (AUTH_TOKEN && !authSent) {
+          try {
+            ws?.send(JSON.stringify({ type: 'auth', token: AUTH_TOKEN }));
+            authSent = true;
+          } catch (err) {
+            console.warn('Failed to send auth on ws connect:', err);
+          }
+        }
       };
 
       ws.onmessage = (event) => {

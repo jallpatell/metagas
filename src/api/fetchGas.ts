@@ -1,14 +1,12 @@
-import WebSocket, { WebSocketServer } from 'ws';
+import WebSocket from 'ws';
+const { Server: WebSocketServer } = require('ws');
 import http from 'http';
-import dotenv from 'dotenv';
-dotenv.config();
+require('dotenv').config();
 
-/** Server config */
 const PORT = parseInt(process.env.PORT || '4000', 10);
 const WS_AUTH_TOKEN = process.env.WS_AUTH_TOKEN || '';
-const USE_AUTH = !!WS_AUTH_TOKEN; // Enable auth if token exists
+const USE_AUTH = !!WS_AUTH_TOKEN; 
 
-/** Order book fetching from Binance (no changes) */
 type BinanceDepthStreamMessage = {
   e: string;
   E: number;
@@ -107,9 +105,6 @@ class OrderBookService {
   }
 }
 
-// --- WebSocket Server Section --- //
-
-/** Create HTTP server (for health checks and ws upgrade) */
 const server = http.createServer((req, res) => {
   if (req.url === '/' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -124,10 +119,10 @@ const wss = new WebSocketServer({ server });
 
 function broadcast(type: string, data: any) {
   const payload = JSON.stringify({ type, data });
-  wss.clients.forEach((client) => {
+  wss.clients.forEach((client: any) => {
     if (client.readyState === WebSocket.OPEN) {
       // Optionally, only send to authorized clients (with .isAuthed)
-      if (!USE_AUTH || (client as any).isAuthed) {
+      if (!USE_AUTH || client.isAuthed) {
         client.send(payload);
       }
     }
@@ -136,19 +131,17 @@ function broadcast(type: string, data: any) {
 
 const orderBookService = new OrderBookService(broadcast);
 
-wss.on('connection', (ws, req) => {
+wss.on('connection', (ws: any, req: any) => {
   if (USE_AUTH) {
-    // Simple API token authentication: require token header or initial message
     let authed = false;
     let token = '';
-    // Try header first (for custom ws clients)
+
     if (req.headers['sec-websocket-protocol']) {
       token = req.headers['sec-websocket-protocol'].split(',')[0].trim();
       if (token === WS_AUTH_TOKEN) authed = true;
     }
-    // Fallback: wait for client to send token as first message (for browsers)
     if (!authed) {
-      ws.once('message', (data) => {
+      ws.once('message', (data: any) => {
         try {
           const msg = JSON.parse(data.toString());
           if (msg.type === 'auth' && msg.token === WS_AUTH_TOKEN) {
@@ -171,7 +164,6 @@ wss.on('connection', (ws, req) => {
   ws.send(JSON.stringify({ type: 'welcome', message: 'Connected to MetaGas real-time WS.' }));
 
   ws.on('close', () => {
-    // Cleanup, log out, or similar if needed
   });
 });
 
