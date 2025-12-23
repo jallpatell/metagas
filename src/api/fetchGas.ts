@@ -1,6 +1,14 @@
-import WebSocket from 'ws';
-import { updateOrderBook } from './fetchGas';
+import WebSocket, { WebSocketServer } from 'ws';
+import http from 'http';
+import dotenv from 'dotenv';
+dotenv.config();
 
+/** Server config */
+const PORT = parseInt(process.env.PORT || '4000', 10);
+const WS_AUTH_TOKEN = process.env.WS_AUTH_TOKEN || '';
+const USE_AUTH = !!WS_AUTH_TOKEN; // Enable auth if token exists
+
+/** Order book fetching from Binance (no changes) */
 type BinanceDepthStreamMessage = {
   e: string;
   E: number;
@@ -20,7 +28,7 @@ class OrderBookService {
   private readonly baseRetryMs = 5000;
   private readonly maxRetryMs = 60000;
 
-  constructor() {
+  constructor(private broadcastFn: (type: string, data: any) => void) {
     this.symbols.forEach((symbol) => {
       this.orderBookData.set(symbol, { bids: new Map(), asks: new Map() });
       this.connectToBinance(symbol);
@@ -90,7 +98,7 @@ class OrderBookService {
       .slice(0, 10)
       .map(([p, a]) => [p.toString(), a.toString()] as [string, string]);
 
-    updateOrderBook(symbol, bids, asks);
+    this.broadcastFn('orderbook', { symbol, bids, asks, timestamp: Date.now() });
   }
 
   public closeAll() {
@@ -99,12 +107,86 @@ class OrderBookService {
   }
 }
 
-const orderBookService = new OrderBookService();
+// --- WebSocket Server Section --- //
+
+/** Create HTTP server (for health checks and ws upgrade) */
+const server = http.createServer((req, res) => {
+  if (req.url === '/' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', message: 'MetaGas WS API alive.' }));
+    return;
+  }
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Not found.' }));
+});
+
+const wss = new WebSocketServer({ server });
+
+function broadcast(type: string, data: any) {
+  const payload = JSON.stringify({ type, data });
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      // Optionally, only send to authorized clients (with .isAuthed)
+      if (!USE_AUTH || (client as any).isAuthed) {
+        client.send(payload);
+      }
+    }
+  });
+}
+
+const orderBookService = new OrderBookService(broadcast);
+
+wss.on('connection', (ws, req) => {
+  if (USE_AUTH) {
+    // Simple API token authentication: require token header or initial message
+    let authed = false;
+    let token = '';
+    // Try header first (for custom ws clients)
+    if (req.headers['sec-websocket-protocol']) {
+      token = req.headers['sec-websocket-protocol'].split(',')[0].trim();
+      if (token === WS_AUTH_TOKEN) authed = true;
+    }
+    // Fallback: wait for client to send token as first message (for browsers)
+    if (!authed) {
+      ws.once('message', (data) => {
+        try {
+          const msg = JSON.parse(data.toString());
+          if (msg.type === 'auth' && msg.token === WS_AUTH_TOKEN) {
+            (ws as any).isAuthed = true;
+            ws.send(JSON.stringify({ type: 'auth', status: 'ok' }));
+          } else {
+            ws.send(JSON.stringify({ type: 'auth', status: 'error', error: 'Invalid token' }));
+            ws.close();
+          }
+        } catch {
+          ws.send(JSON.stringify({ type: 'auth', status: 'error', error: 'Malformed auth' }));
+          ws.close();
+        }
+      });
+      return;
+    }
+    (ws as any).isAuthed = authed;
+  }
+
+  ws.send(JSON.stringify({ type: 'welcome', message: 'Connected to MetaGas real-time WS.' }));
+
+  ws.on('close', () => {
+    // Cleanup, log out, or similar if needed
+  });
+});
 
 process.on('SIGINT', () => {
   console.log('Shutting down order book service...');
   orderBookService.closeAll();
-  process.exit(0);
+  server.close(() => process.exit(0));
+});
+
+server.listen(PORT, () => {
+  console.log(`🚀 MetaGas backend listening on port ${PORT}`);
+  if (USE_AUTH)
+    console.log('🔐 WebSocket AUTH required. Set WS_AUTH_TOKEN for clients.');
+  else
+    console.log('⚠️ WebSocket backend is PUBLIC for real-time data.');
 });
 
 export default orderBookService;
